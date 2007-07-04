@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		2
 Version:	3.0.5
-Release:	%mkrel 7
+Release:	%mkrel 8
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
@@ -155,10 +155,11 @@ cat << EOF >>includes/site.h
 EOF
 
 %build
+%serverbuild
 echo 'int main() { return sizeof(void *) != 8; }' | gcc -xc - -o is_ptr64
 ./is_ptr64 && PTR64_FLAGS="-DPTRSIZE_64BIT"
 
-./configure --copts "%{optflags} $PTR64_FLAGS -DPARANOIA -DCL_DEFAULT_TIMEOUT=60 -DLDAP_DEPRECATED"
+./configure --copts "$RPM_OPT_FLAGS $PTR64_FLAGS -DPARANOIA -DCL_DEFAULT_TIMEOUT=60 -DLDAP_DEPRECATED"
 
 #-DEARLY_CHROOT
 
