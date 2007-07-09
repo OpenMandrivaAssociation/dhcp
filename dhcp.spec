@@ -3,12 +3,12 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		2
-Version:	3.0.5
-Release:	%mkrel 8
+Version:	3.0.6
+Release:	%mkrel 1
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.bz2
 Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source3:	dhcpd.init
@@ -25,7 +25,7 @@ Patch1:		dhcp-3.0.4-ldap.diff
 Patch2:		dhcp-3.0.1-paranoia.diff
 Patch4:		dhcp-3.0.1-default-timeout.patch
 BuildRequires:	perl groff-for-man openldap-devel
-Requires(post): rpm-helper
+Requires(post):	rpm-helper
 Requires(preun): rpm-helper
 Provides:	dhcpd
 Obsoletes:	dhcpd
@@ -79,7 +79,7 @@ DHCP server and a DHCP relay agent.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 Requires:	dhcp-common = %{epoch}:%{version}
-Requires(pre): rpm-helper
+Requires(pre):	rpm-helper
 Requires(postun): rpm-helper
 Obsoletes:	dhcp
 Provides:	dhcp
@@ -110,7 +110,7 @@ install the base dhcp package.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
 Requires:	dhcp-common = %{epoch}:%{version}
-Requires(pre): rpm-helper
+Requires(pre):	rpm-helper
 Requires(postun): rpm-helper
 
 %description	relay
@@ -323,5 +323,3 @@ rm -rf %{buildroot}
 %{_includedir}/*
 %{_libdir}/*
 %{_mandir}/man3/*
-
-
