@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		2
 Version:	3.0.6
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
@@ -25,8 +25,6 @@ Patch1:		dhcp-3.0.4-ldap.diff
 Patch2:		dhcp-3.0.1-paranoia.diff
 Patch4:		dhcp-3.0.1-default-timeout.patch
 BuildRequires:	perl groff-for-man openldap-devel
-Requires(post):	rpm-helper
-Requires(preun): rpm-helper
 Provides:	dhcpd
 Obsoletes:	dhcpd
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -79,8 +77,8 @@ DHCP server and a DHCP relay agent.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 Requires:	dhcp-common = %{epoch}:%{version}
-Requires(pre):	rpm-helper
-Requires(postun): rpm-helper
+Requires(post):	rpm-helper
+Requires(preun): rpm-helper
 Obsoletes:	dhcp
 Provides:	dhcp
 
@@ -110,8 +108,8 @@ install the base dhcp package.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
 Requires:	dhcp-common = %{epoch}:%{version}
-Requires(pre):	rpm-helper
-Requires(postun): rpm-helper
+Requires(post):	rpm-helper
+Requires(preun): rpm-helper
 
 %description	relay
 DHCP relay is the Internet Software Consortium (ISC) relay agent for DHCP
