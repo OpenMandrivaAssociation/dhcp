@@ -63,7 +63,7 @@ Summary:	Documentation about the ISC DHCP server/client
 Group:		System/Servers
 
 %description	doc
-This packages contains RFC/API/protocol documentation about the ISC
+This package contains RFC/API/protocol documentation about the ISC
 DHCP server and client.
 
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
