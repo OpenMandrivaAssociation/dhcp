@@ -27,6 +27,7 @@ Patch4:		dhcp-3.0.1-default-timeout.patch
 BuildRequires:	perl groff-for-man openldap-devel
 Provides:	dhcpd
 Obsoletes:	dhcpd
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description 
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
