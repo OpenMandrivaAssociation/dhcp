@@ -138,7 +138,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch4 -p1 -b .default-timeout
 
 cat << EOF >site.conf
-VARDB=%{_localstatedir}/dhcp
+VARDB=%{_localstatedir}/lib/dhcp
 LIBDIR=%{_libdir}
 INCDIR=%{_includedir}
 ADMMANDIR=%{_mandir}/man8
@@ -148,8 +148,8 @@ USRMANDIR=%{_mandir}/man1
 EOF
 cat << EOF >>includes/site.h
 #define _PATH_DHCPD_PID		"%{_var}/run/dhcpd/dhcpd.pid"
-#define _PATH_DHCPD_DB		"%{_localstatedir}/dhcp/dhcpd.leases"
-#define _PATH_DHCLIENT_DB	"%{_localstatedir}/dhcp/dhclient.leases"
+#define _PATH_DHCPD_DB		"%{_localstatedir}/lib/dhcp/dhcpd.leases"
+#define _PATH_DHCLIENT_DB	"%{_localstatedir}/lib/dhcp/dhclient.leases"
 EOF
 
 %build
@@ -169,7 +169,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
-install -d %{buildroot}%{_localstatedir}/dhcp
+install -d %{buildroot}%{_localstatedir}/lib/dhcp
 install -d %{buildroot}%{_var}/run/dhcpd
 
 %makeinstall_std
@@ -199,8 +199,8 @@ OPTIONS="-q"
 
 EOF
 
-touch %{buildroot}%{_localstatedir}/dhcp/dhcpd.leases
-touch %{buildroot}%{_localstatedir}/dhcp/dhclient.leases
+touch %{buildroot}%{_localstatedir}/lib/dhcp/dhcpd.leases
+touch %{buildroot}%{_localstatedir}/lib/dhcp/dhclient.leases
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcrelay <<EOF
 # Define SERVERS with a list of one or more DHCP servers where
@@ -225,8 +225,8 @@ find -size 0 |grep ldap | xargs rm -rf
 %post server
 %_post_service dhcpd
 # New dhcpd lease file
-if [ ! -f %{_localstatedir}/dhcp/dhcpd.leases ]; then
-    touch %{_localstatedir}/dhcp/dhcpd.leases
+if [ ! -f %{_localstatedir}/lib/dhcp/dhcpd.leases ]; then
+    touch %{_localstatedir}/lib/dhcp/dhcpd.leases
 fi
 
 if [ $1 = 0 ]; then
@@ -270,7 +270,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc README README.ldap RELNOTES Changelog-LDAP
 %doc contrib/3.0b1-lease-convert
-%dir %{_localstatedir}/dhcp
+%dir %{_localstatedir}/lib/dhcp
 %{_mandir}/man5/dhcp-options.5*
 
 %files doc
@@ -283,7 +283,7 @@ rm -rf %{buildroot}
 %{_initrddir}/dhcpd
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
-%config(noreplace) %ghost %{_localstatedir}/dhcp/dhcpd.leases
+%config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhcpd.leases
 %{_sbindir}/dhcpd
 %{_sbindir}/update_dhcp.pl
 %{_sbindir}/dhcpreport.pl
@@ -308,7 +308,7 @@ rm -rf %{buildroot}
 %files client
 %defattr(-,root,root)
 %doc client/dhclient.conf
-%config(noreplace) %ghost %{_localstatedir}/dhcp/dhclient.leases
+%config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
 %attr (0755,root,root) /sbin/dhclient-script
 /sbin/dhclient
 %{_mandir}/man5/dhclient.conf.5*
