@@ -3,12 +3,12 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		2
-Version:	3.0.6
-Release:	%mkrel 6
+Version:	3.0.7
+Release:	%mkrel 1
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.bz2
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz
 Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source3:	dhcpd.init
@@ -19,14 +19,15 @@ Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
 Patch0:		dhcp-3.0.5-ifup.patch
 # http://home.ntelos.net/%7Emasneyb/dhcp-3.0.1rc14-ldap-patch
-# http://www.newwave.net/~masneyb/dhcp-3.0.3-ldap-patch
-Patch1:		dhcp-3.0.4-ldap.diff
+# http://www.newwave.net/~masneyb/dhcp-3.0.5-ldap-patch
+Patch1:		dhcp-3.0.5-ldap.patch
 # (oe) http://www.episec.com/people/edelkind/patches/
 Patch2:		dhcp-3.0.1-paranoia.diff
 Patch4:		dhcp-3.0.1-default-timeout.patch
-BuildRequires:	perl groff-for-man openldap-devel
+BuildRequires:	perl groff-for-man
+BuildRequires:	openldap-devel
 Provides:	dhcpd
-Obsoletes:	dhcpd
+Obsoletes:	dhcpd < 3.0.6
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description 
@@ -41,11 +42,11 @@ or pump or dhcpxd, which provides the DHCP client daemon, on client machines.
 If you want the DHCP server and/or relay, you will also need to install the
 dhcp-server and/or dhcp-relay packages.
 
-%package	common
+%package common
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 
-%description	common
+%description common
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
 individual devices on an IP network to get their own network 
 configuration information (IP address, subnetmask, broadcast address, 
@@ -58,11 +59,11 @@ dhcpxd, which provides the DHCP client daemon, on  client machines. If you
 want the DHCP server and/or relay, you will also need to install the
 dhcp-server and/or dhcp-relay packages.
 
-%package	doc
+%package doc
 Summary:	Documentation about the ISC DHCP server/client
 Group:		System/Servers
 
-%description	doc
+%description doc
 This package contains RFC/API/protocol documentation about the ISC
 DHCP server and client.
 
@@ -73,16 +74,16 @@ etc.) from a DHCP server.  The overall purpose of DHCP is to make it
 easier to administer a large network.  The dhcp package includes the 
 DHCP server and a DHCP relay agent.
 
-%package	server
+%package server
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
-Requires:	dhcp-common = %{epoch}:%{version}
+Requires:	dhcp-common = %{epoch}:%{version}-%{release}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
-Obsoletes:	dhcp
+Obsoletes:	dhcp < 3.0.6
 Provides:	dhcp
 
-%description	server
+%description server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
 UNIX operating systems. It allows a UNIX mac hine to serve DHCP requests from
 the network.
@@ -90,12 +91,12 @@ the network.
 You should install dhcp-server if you want to set up a DHCP server on your
 network. You will also need to install the base dhcp package.
 
-%package	client
+%package client
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
-Requires:	dhcp-common = %{epoch}:%{version}
+Requires:	dhcp-common = %{epoch}:%{version}-%{release}
 
-%description	client
+%description client
 DHCP client is the Internet Software Consortium (ISC) DHCP client for various
 UNIX operating systems.  It allows a UNIX mac hine to obtain it's networking
 parameters from a DHCP server.
@@ -104,14 +105,14 @@ You should install dhcp-client if you want to use the ISC DHCP client instead
 of the Red Hat DHCP client, pump, or dhcpcd, or dhcpxd. You will also need to
 install the base dhcp package.
 
-%package	relay
+%package relay
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
-Requires:	dhcp-common = %{epoch}:%{version}
+Requires:	dhcp-common = %{epoch}:%{version}-%{release}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
 
-%description	relay
+%description relay
 DHCP relay is the Internet Software Consortium (ISC) relay agent for DHCP
 packets. It is used on a subnet with DHCP clients to "relay" their requests
 to a subnet that has a DHCP server on it. Because DHCP packets can be
@@ -120,12 +121,12 @@ takes care of this for the client. You will need to set the environment
 variable SERVERS and optionally OPTIONS in /etc/sysconfig/dhcrelay before
 starting the server.
 
-%package	devel
+%package devel
 Summary:	Development headers and libraries for the dhcpctl API
 Group:		Development/Other
-Requires:	dhcp-common = %{epoch}:%{version}
+Requires:	dhcp-common = %{epoch}:%{version}-%{release}
 
-%description	devel
+%description devel
 DHCP devel contains all of the libraries and headers for developing with the
 Internet Software Consortium (ISC) dhcpctl API.
 
@@ -138,7 +139,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch4 -p1 -b .default-timeout
 
 cat << EOF >site.conf
-VARDB=%{_localstatedir}/lib/dhcp
+VARDB=%{_var}/lib/dhcp
 LIBDIR=%{_libdir}
 INCDIR=%{_includedir}
 ADMMANDIR=%{_mandir}/man8
@@ -148,8 +149,8 @@ USRMANDIR=%{_mandir}/man1
 EOF
 cat << EOF >>includes/site.h
 #define _PATH_DHCPD_PID		"%{_var}/run/dhcpd/dhcpd.pid"
-#define _PATH_DHCPD_DB		"%{_localstatedir}/lib/dhcp/dhcpd.leases"
-#define _PATH_DHCLIENT_DB	"%{_localstatedir}/lib/dhcp/dhclient.leases"
+#define _PATH_DHCPD_DB		"%{_var}/lib/dhcp/dhcpd.leases"
+#define _PATH_DHCLIENT_DB	"%{_var}/lib/dhcp/dhclient.leases"
 EOF
 
 %build
@@ -157,7 +158,7 @@ EOF
 echo 'int main() { return sizeof(void *) != 8; }' | gcc -xc - -o is_ptr64
 ./is_ptr64 && PTR64_FLAGS="-DPTRSIZE_64BIT"
 
-./configure --copts "$RPM_OPT_FLAGS $PTR64_FLAGS -DPARANOIA -DCL_DEFAULT_TIMEOUT=60 -DLDAP_DEPRECATED"
+./configure --copts "%{optflags} $PTR64_FLAGS -DPARANOIA -DCL_DEFAULT_TIMEOUT=60 -DLDAP_DEPRECATED"
 
 #-DEARLY_CHROOT
 
@@ -169,7 +170,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
-install -d %{buildroot}%{_localstatedir}/lib/dhcp
+install -d %{buildroot}%{_var}/lib/dhcp
 install -d %{buildroot}%{_var}/run/dhcpd
 
 %makeinstall_std
@@ -199,8 +200,8 @@ OPTIONS="-q"
 
 EOF
 
-touch %{buildroot}%{_localstatedir}/lib/dhcp/dhcpd.leases
-touch %{buildroot}%{_localstatedir}/lib/dhcp/dhclient.leases
+touch %{buildroot}%{_var}/lib/dhcp/dhcpd.leases
+touch %{buildroot}%{_var}/lib/dhcp/dhclient.leases
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcrelay <<EOF
 # Define SERVERS with a list of one or more DHCP servers where
@@ -225,8 +226,8 @@ find -size 0 |grep ldap | xargs rm -rf
 %post server
 %_post_service dhcpd
 # New dhcpd lease file
-if [ ! -f %{_localstatedir}/lib/dhcp/dhcpd.leases ]; then
-    touch %{_localstatedir}/lib/dhcp/dhcpd.leases
+if [ ! -f %{_var}/lib/dhcp/dhcpd.leases ]; then
+    touch %{_var}/lib/dhcp/dhcpd.leases
 fi
 
 if [ $1 = 0 ]; then
@@ -270,7 +271,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc README README.ldap RELNOTES Changelog-LDAP
 %doc contrib/3.0b1-lease-convert
-%dir %{_localstatedir}/lib/dhcp
+%dir %{_var}/lib/dhcp
 %{_mandir}/man5/dhcp-options.5*
 
 %files doc
@@ -283,7 +284,7 @@ rm -rf %{buildroot}
 %{_initrddir}/dhcpd
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
-%config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhcpd.leases
+%config(noreplace) %ghost %{_var}/lib/dhcp/dhcpd.leases
 %{_sbindir}/dhcpd
 %{_sbindir}/update_dhcp.pl
 %{_sbindir}/dhcpreport.pl
@@ -308,7 +309,7 @@ rm -rf %{buildroot}
 %files client
 %defattr(-,root,root)
 %doc client/dhclient.conf
-%config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
+%config(noreplace) %ghost %{_var}/lib/dhcp/dhclient.leases
 %attr (0755,root,root) /sbin/dhclient-script
 /sbin/dhclient
 %{_mandir}/man5/dhclient.conf.5*
