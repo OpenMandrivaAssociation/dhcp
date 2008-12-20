@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		2
 Version:	3.0.7
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
@@ -24,6 +24,7 @@ Patch1:		dhcp-3.0.5-ldap.patch
 # (oe) http://www.episec.com/people/edelkind/patches/
 Patch2:		dhcp-3.0.1-paranoia.diff
 Patch4:		dhcp-3.0.1-default-timeout.patch
+Patch5:		dhcp-3.0.7-format_not_a_string_literal_and_no_format_arguments.diff
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
@@ -137,6 +138,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch1 -p1 -b .dhcp-ldap
 %patch2 -p1 -b .paranoia
 %patch4 -p1 -b .default-timeout
+%patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 
 cat << EOF >site.conf
 VARDB=%{_var}/lib/dhcp
