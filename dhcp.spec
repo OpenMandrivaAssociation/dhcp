@@ -3,8 +3,8 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		2
-Version:	3.0.7
-Release:	%mkrel 2
+Version:	4.1.0
+Release:	%mkrel 1
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
@@ -17,14 +17,17 @@ Source5:	dhcrelay.init
 Source6:	update_dhcp.pl
 Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
-Patch0:		dhcp-3.0.5-ifup.patch
-# http://home.ntelos.net/%7Emasneyb/dhcp-3.0.1rc14-ldap-patch
+Source9:	dhcpd-conf-to-ldap.pl
+Source10:	README.ldap
+Source11:	dhcp.schema
+Source12:	draft-ietf-dhc-ldap-schema-01.txt
+# customize ifup script
+Patch0:		dhcp-4.1.0-ifup.patch
+# initial patch from 
 # http://www.newwave.net/~masneyb/dhcp-3.0.5-ldap-patch
-Patch1:		dhcp-3.0.5-ldap.patch
-# (oe) http://www.episec.com/people/edelkind/patches/
-Patch2:		dhcp-3.0.1-paranoia.diff
-Patch4:		dhcp-3.0.1-default-timeout.patch
-Patch5:		dhcp-3.0.7-format_not_a_string_literal_and_no_format_arguments.diff
+# now, taken from Fedora
+Patch1:		dhcp-4.1.0-ldap-configuration.patch
+Patch5:		dhcp-4.1.0-format_not_a_string_literal_and_no_format_arguments.patch
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
@@ -136,33 +139,28 @@ Internet Software Consortium (ISC) dhcpctl API.
 %setup -q -n %{name}-%{version} -a4
 %patch0 -p1 -b .ifup
 %patch1 -p1 -b .dhcp-ldap
-%patch2 -p1 -b .paranoia
-%patch4 -p1 -b .default-timeout
 %patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 
-cat << EOF >site.conf
-VARDB=%{_var}/lib/dhcp
-LIBDIR=%{_libdir}
-INCDIR=%{_includedir}
-ADMMANDIR=%{_mandir}/man8
-FFMANDIR=%{_mandir}/man5
-LIBMANDIR=%{_mandir}/man3
-USRMANDIR=%{_mandir}/man1
-EOF
-cat << EOF >>includes/site.h
-#define _PATH_DHCPD_PID		"%{_var}/run/dhcpd/dhcpd.pid"
-#define _PATH_DHCPD_DB		"%{_var}/lib/dhcp/dhcpd.leases"
-#define _PATH_DHCLIENT_DB	"%{_var}/lib/dhcp/dhclient.leases"
-EOF
+#needed by patch5
+autoreconf
+
+install -m0644 %{SOURCE10} .
+install -m0644 %{SOURCE11} contrib
+install -m0644 %{SOURCE12} doc
 
 %build
 %serverbuild
-echo 'int main() { return sizeof(void *) != 8; }' | gcc -xc - -o is_ptr64
-./is_ptr64 && PTR64_FLAGS="-DPTRSIZE_64BIT"
-
-./configure --copts "%{optflags} $PTR64_FLAGS -DPARANOIA -DCL_DEFAULT_TIMEOUT=60 -DLDAP_DEPRECATED"
-
-#-DEARLY_CHROOT
+CFLAGS="%{optflags} -D_GNU_SOURCE -DLDAP_CONFIGURATION -DUSE_SSL"
+%configure2_5x --enable-paranoia --enable-early-chroot \
+    --with-srv-lease-file=%{_var}/lib/dhcp/dhcpd.leases \
+    --with-srv6-lease-file=%{_var}/lib/dhcp/dhcpd6.leases \
+    --with-cli-lease-file=%{_var}/lib/dhcp/dhclient.leases \
+    --with-cli6-lease-file=%{_var}/lib/dhcp/dhclient6.leases \
+    --with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
+    --with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
+    --with-cli-pid-file=%{_var}/run/dhclient.pid \
+    --with-cli6-pid-file=%{_var}/run/dhclient6.pid \
+    --with-relay-pid-file=%{_var}/run/dhcrelay.pid
 
 %make
 
@@ -177,11 +175,17 @@ install -d %{buildroot}%{_var}/run/dhcpd
 
 %makeinstall_std
 
+# Install correct dhclient-script
+%{__mkdir} -p %{buildroot}/sbin
+%{__mv} %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
+%{__install} -p -m 0755 client/scripts/linux %{buildroot}/sbin/dhclient-script
+
+
 install -m0755 %{SOURCE3} %{buildroot}%{_initrddir}/dhcpd
 install -m0755 %{SOURCE5} %{buildroot}%{_initrddir}/dhcrelay
 install -m0755 %{SOURCE6} %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
 install -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/
-install -m0755 contrib/dhcpd-conf-to-ldap.pl %{buildroot}%{_sbindir}/
+install -m0755 %{SOURCE9} %{buildroot}%{_sbindir}/
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd <<EOF
 # You can set here various option for dhcpd
@@ -224,6 +228,9 @@ rm -rf doc/ja_JP.eucJP
 
 # remove empty files
 find -size 0 |grep ldap | xargs rm -rf 
+
+# remove unwanted file
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/dhclient.conf
 
 %post server
 %_post_service dhcpd
@@ -271,7 +278,7 @@ rm -rf %{buildroot}
 
 %files common
 %defattr(-,root,root)
-%doc README README.ldap RELNOTES Changelog-LDAP
+%doc README README.ldap RELNOTES 
 %doc contrib/3.0b1-lease-convert
 %dir %{_var}/lib/dhcp
 %{_mandir}/man5/dhcp-options.5*
