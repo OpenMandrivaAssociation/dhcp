@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		2
 Version:	4.1.0
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/dhcp.html
@@ -29,7 +29,7 @@ Patch0:		dhcp-4.1.0-ifup.patch
 Patch1:		dhcp-4.1.0-ldap-configuration.patch
 Patch5:		dhcp-4.1.0-format_not_a_string_literal_and_no_format_arguments.patch
 # (fc) 4.1.0-3mdv no IPv6 is no longer fatal for dhclient
-Patch6:		dhcp-4.1.0-noipv6nonfatal.patch
+Patch6:		dhcp-4.1.0-missing-ipv6-not-fatal.patch
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
