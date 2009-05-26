@@ -7,7 +7,7 @@ Version:	4.1.0
 Release:	%mkrel 5
 License:	Distributable
 Group:		System/Servers
-URL:		http://www.isc.org/dhcp.html
+URL:		https://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz
 Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
