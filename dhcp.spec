@@ -3,8 +3,8 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		2
-Version:	4.1.0
-Release:	%mkrel 6
+Version:	4.1.0p1
+Release:	%mkrel 1
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
