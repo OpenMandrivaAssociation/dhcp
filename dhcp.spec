@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		2
 Version:	4.1.0p1
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
@@ -35,6 +35,7 @@ Patch7:		dhcp-4.1.0-prevent_wireless_deassociation.patch
 # closes mdv #50194 - reported upstream: ISC-Bugs #19627
 Patch8:		dhcp-4.1.0-fix_lease_parsing.patch
 Patch9:		dhcp-4.1.0-CVE-2009-1892.diff
+Patch10:	dhcp-4.1.0-mtu.patch
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
@@ -151,6 +152,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch7 -p1 -b .prevent_wireless_deassociation
 %patch8 -p1 -b .fix_lease_parsing
 %patch9 -p0 -b .CVE-2009-1892
+%patch10 -p1 -b .mtu
 
 #needed by patch5
 autoreconf
