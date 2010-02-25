@@ -3,8 +3,8 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		2
-Version:	4.1.0p1
-Release:	%mkrel 4
+Version:	4.1.1
+Release:	%mkrel 1
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
@@ -22,20 +22,18 @@ Source10:	README.ldap
 Source11:	dhcp.schema
 Source12:	draft-ietf-dhc-ldap-schema-01.txt
 # customize ifup script
-Patch0:		dhcp-4.1.0-ifup.patch
+Patch0:		dhcp-4.1.1-ifup.patch
 # initial patch from 
 # http://www.newwave.net/~masneyb/dhcp-3.0.5-ldap-patch
 # now, taken from Fedora
 Patch1:		dhcp-4.1.0-ldap-configuration.patch
-Patch5:		dhcp-4.1.0-format_not_a_string_literal_and_no_format_arguments.patch
+Patch5:		dhcp-4.1.1-format_not_a_string_literal_and_no_format_arguments.patch
 # (fc) 4.1.0-3mdv no IPv6 is no longer fatal for dhclient
-Patch6:		dhcp-4.1.0-missing-ipv6-not-fatal.patch
+Patch6:		dhcp-4.1.1-missing-ipv6-not-fatal.patch
 # prevents needless deassociation, working around mdv bug #43441
-Patch7:		dhcp-4.1.0-prevent_wireless_deassociation.patch
+Patch7:		dhcp-4.1.1-prevent_wireless_deassociation.patch
 # closes mdv #50194 - reported upstream: ISC-Bugs #19627
 Patch8:		dhcp-4.1.0-fix_lease_parsing.patch
-Patch9:		dhcp-4.1.0-CVE-2009-1892.diff
-Patch10:	dhcp-4.1.0-mtu.patch
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
@@ -151,8 +149,6 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch6 -p1 -b .noipv6nonfatal
 %patch7 -p1 -b .prevent_wireless_deassociation
 %patch8 -p1 -b .fix_lease_parsing
-%patch9 -p0 -b .CVE-2009-1892
-%patch10 -p1 -b .mtu
 
 #needed by patch5
 autoreconf
