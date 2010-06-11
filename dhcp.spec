@@ -4,12 +4,12 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		2
 Version:	4.1.1
-Release:	%mkrel 5
+Release:	%mkrel 6
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz.sha512.asc
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-P1.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-P1.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source3:	dhcpd.init
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
@@ -142,7 +142,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
 
-%setup -q -n %{name}-%{version} -a4
+%setup -q -n %{name}-%{version}-P1 -a4
 %patch0 -p1 -b .ifup
 %patch1 -p1 -b .dhcp-ldap
 %patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
