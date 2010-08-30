@@ -149,7 +149,6 @@ install -m0644 %{SOURCE12} doc
 
 %build
 %serverbuild
-CFLAGS="%{optflags} -D_GNU_SOURCE"
 %configure2_5x --enable-paranoia --enable-early-chroot \
     --with-ldapcrypto \
     --with-srv-lease-file=%{_var}/lib/dhcp/dhcpd.leases \
