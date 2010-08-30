@@ -3,13 +3,13 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		2
-Version:	4.1.1
-Release:	%mkrel 7
+Version:	4.2.0
+Release:	%mkrel 1
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-P1.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-P1.tar.gz.sha512.asc
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source3:	dhcpd.init
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
@@ -17,16 +17,9 @@ Source5:	dhcrelay.init
 Source6:	update_dhcp.pl
 Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
-Source9:	dhcpd-conf-to-ldap.pl
-Source10:	README.ldap
-Source11:	dhcp.schema
 Source12:	draft-ietf-dhc-ldap-schema-01.txt
 # customize ifup script
 Patch0:		dhcp-4.1.1-ifup.patch
-# initial patch from 
-# http://www.newwave.net/~masneyb/dhcp-3.0.5-ldap-patch
-# now, taken from Fedora
-Patch1:		dhcp-4.1.0-ldap-configuration.patch
 Patch5:		dhcp-4.1.1-format_not_a_string_literal_and_no_format_arguments.patch
 # (fc) 4.1.0-3mdv no IPv6 is no longer fatal for dhclient
 Patch6:		dhcp-4.1.1-missing-ipv6-not-fatal.patch
@@ -144,26 +137,21 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
 
-%setup -q -n %{name}-%{version}-P1 -a4
+%setup -q -n %{name}-%{version} -a4
 %patch0 -p1 -b .ifup
-%patch1 -p1 -b .dhcp-ldap
 %patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch6 -p1 -b .noipv6nonfatal
 %patch7 -p1 -b .prevent_wireless_deassociation
 %patch8 -p1 -b .fix_lease_parsing
 %patch9 -p0 -b .useless_wait
 
-#needed by patch5
-autoreconf
-
-install -m0644 %{SOURCE10} .
-install -m0644 %{SOURCE11} contrib
 install -m0644 %{SOURCE12} doc
 
 %build
 %serverbuild
-CFLAGS="%{optflags} -D_GNU_SOURCE -DLDAP_CONFIGURATION -DUSE_SSL"
+CFLAGS="%{optflags} -D_GNU_SOURCE"
 %configure2_5x --enable-paranoia --enable-early-chroot \
+    --with-ldapcrypto \
     --with-srv-lease-file=%{_var}/lib/dhcp/dhcpd.leases \
     --with-srv6-lease-file=%{_var}/lib/dhcp/dhcpd6.leases \
     --with-cli-lease-file=%{_var}/lib/dhcp/dhclient.leases \
@@ -197,7 +185,7 @@ install -m0755 %{SOURCE3} %{buildroot}%{_initrddir}/dhcpd
 install -m0755 %{SOURCE5} %{buildroot}%{_initrddir}/dhcrelay
 install -m0755 %{SOURCE6} %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
 install -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/
-install -m0755 %{SOURCE9} %{buildroot}%{_sbindir}/
+install -m0755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}/
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd <<EOF
 # You can set here various option for dhcpd
@@ -290,7 +278,7 @@ rm -rf %{buildroot}
 
 %files common
 %defattr(-,root,root)
-%doc README README.ldap RELNOTES 
+%doc README contrib/ldap/README.ldap RELNOTES
 %doc contrib/3.0b1-lease-convert
 %dir %{_var}/lib/dhcp
 %{_mandir}/man5/dhcp-options.5*
@@ -301,7 +289,7 @@ rm -rf %{buildroot}
 
 %files server
 %defattr(-,root,root)
-%doc server/dhcpd.conf tests/failover contrib/dhcp.schema
+%doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
 %{_initrddir}/dhcpd
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
@@ -309,7 +297,7 @@ rm -rf %{buildroot}
 %{_sbindir}/dhcpd
 %{_sbindir}/update_dhcp.pl
 %{_sbindir}/dhcpreport.pl
-%{_sbindir}/dhcpd-conf-to-ldap.pl
+%{_sbindir}/dhcpd-conf-to-ldap
 %{_sbindir}/dhcpd-chroot.sh
 %{_bindir}/omshell
 %{_mandir}/man1/omshell.1*
