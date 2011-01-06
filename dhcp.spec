@@ -1,15 +1,16 @@
 %define _catdir /var/cache/man
+%define pver P2
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
-Epoch:		2
+Epoch:		3
 Version:	4.2.0
-Release:	%mkrel 2.P1.1
+Release:	%mkrel 0.%{pver}.1
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-P1.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-P1.tar.gz.sha512.asc
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-%{pver}.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-%{pver}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source3:	dhcpd.init
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
@@ -137,7 +138,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
 
-%setup -q -n %{name}-%{version}-P1 -a4
+%setup -q -n %{name}-%{version}-%{pver} -a4
 %patch0 -p1 -b .ifup
 %patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch6 -p1 -b .noipv6nonfatal
@@ -265,7 +266,7 @@ fi
 if [ "$1" -ge "1" ]; then
     /sbin/service dhcrelay condrestart >/dev/null 2>&1
 fi
-		 
+
 %post client
 touch /var/lib/dhcp/dhclient.leases
 
