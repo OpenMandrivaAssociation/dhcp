@@ -5,7 +5,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		3
 Version:	4.2.0
-Release:	%mkrel 0.%{pver}.1
+Release:	%mkrel 0.%{pver}.2
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
@@ -18,6 +18,8 @@ Source5:	dhcrelay.init
 Source6:	update_dhcp.pl
 Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
+# (eugeni) dhclient-exit-hooks script
+Source9:	dhclient-exit-hooks
 Source12:	draft-ietf-dhc-ldap-schema-01.txt
 # customize ifup script
 Patch0:		dhcp-4.1.1-ifup.patch
@@ -187,6 +189,9 @@ install -m0755 %{SOURCE6} %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
 install -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/
 install -m0755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}/
 
+# install exit-hooks script to /etc/
+install -m0755 %{SOURCE9} %{buildroot}%{_sysconfdir}/
+
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd <<EOF
 # You can set here various option for dhcpd
 
@@ -292,6 +297,7 @@ rm -rf %{buildroot}
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
 %{_initrddir}/dhcpd
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
+%config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
 %config(noreplace) %ghost %{_var}/lib/dhcp/dhcpd.leases
 %{_sbindir}/dhcpd
