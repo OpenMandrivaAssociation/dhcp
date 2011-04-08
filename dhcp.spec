@@ -1,11 +1,11 @@
 %define _catdir /var/cache/man
-%define pver P2
+%define pver P1
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		3
-Version:	4.2.0
-Release:	%mkrel 0.%{pver}.2
+Version:	4.2.1
+Release:	%mkrel 0.%{pver}.1
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
@@ -28,8 +28,6 @@ Patch5:		dhcp-4.1.1-format_not_a_string_literal_and_no_format_arguments.patch
 Patch6:		dhcp-4.1.1-missing-ipv6-not-fatal.patch
 # prevents needless deassociation, working around mdv bug #43441
 Patch7:		dhcp-4.1.1-prevent_wireless_deassociation.patch
-# closes mdv #50194 - reported upstream: ISC-Bugs #19627
-Patch8:		dhcp-4.1.0-fix_lease_parsing.patch
 # redhat bug #587070
 Patch9:		dhcp-4.1.1-useless-wait.patch
 BuildRequires:	perl groff-for-man
@@ -145,7 +143,6 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch6 -p1 -b .noipv6nonfatal
 %patch7 -p1 -b .prevent_wireless_deassociation
-%patch8 -p1 -b .fix_lease_parsing
 %patch9 -p0 -b .useless_wait
 
 install -m0644 %{SOURCE12} doc
