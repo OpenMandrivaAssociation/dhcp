@@ -30,7 +30,7 @@ Patch6:		dhcp-4.1.1-missing-ipv6-not-fatal.patch
 Patch7:		dhcp-4.1.1-prevent_wireless_deassociation.patch
 # redhat bug #587070
 Patch9:		dhcp-4.1.1-useless-wait.patch
-Patch10:	dhcp-4.1.2-P1-CVE-2011-2748,2749.diff
+Patch10:	dhcp-4.2.1-P1-CVE-2011-2748,2749.diff
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
