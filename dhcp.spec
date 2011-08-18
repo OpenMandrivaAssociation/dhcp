@@ -5,7 +5,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		3
 Version:	4.2.1
-Release:	%mkrel 0.%{pver}.1
+Release:	%mkrel 0.%{pver}.2
 License:	Distributable
 Group:		System/Servers
 URL:		https://www.isc.org/software/dhcp
@@ -30,6 +30,7 @@ Patch6:		dhcp-4.1.1-missing-ipv6-not-fatal.patch
 Patch7:		dhcp-4.1.1-prevent_wireless_deassociation.patch
 # redhat bug #587070
 Patch9:		dhcp-4.1.1-useless-wait.patch
+Patch10:	dhcp-4.1.2-P1-CVE-2011-2748,2749.diff
 BuildRequires:	perl groff-for-man
 BuildRequires:	openldap-devel
 Provides:	dhcpd
@@ -144,6 +145,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch6 -p1 -b .noipv6nonfatal
 %patch7 -p1 -b .prevent_wireless_deassociation
 %patch9 -p0 -b .useless_wait
+%patch10 -p1 -b .CVE-2011-2748,2749
 
 install -m0644 %{SOURCE12} doc
 
