@@ -1,40 +1,40 @@
 %define _catdir /var/cache/man
-%define pver P1
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		3
-Version:	4.2.1
-Release:	%mkrel 0.%{pver}.2
+Version:	4.2.3
+Release:	%mkrel 0
 License:	Distributable
 Group:		System/Servers
-URL:		https://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-%{pver}.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}-%{pver}.tar.gz.sha512.asc
+URL:		http://www.isc.org/software/dhcp
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
-Source3:	dhcpd.init
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
-Source5:	dhcrelay.init
-Source6:	update_dhcp.pl
 Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
 # (eugeni) dhclient-exit-hooks script
 Source9:	dhclient-exit-hooks
-Source12:	draft-ietf-dhc-ldap-schema-01.txt
-# customize ifup script
-Patch0:		dhcp-4.1.1-ifup.patch
-Patch5:		dhcp-4.1.1-format_not_a_string_literal_and_no_format_arguments.patch
-# (fc) 4.1.0-3mdv no IPv6 is no longer fatal for dhclient
-Patch6:		dhcp-4.1.1-missing-ipv6-not-fatal.patch
+Source10:	draft-ietf-dhc-ldap-schema-01.txt
+Source11:	dhcpd.init
+Source12:	dhcpd.service
+Source13:	dhcpd6.init
+Source14:	dhcpd6.service
+Source15:	dhcrelay.init
+Source16:	dhcrelay.service
+# mageia patches
+Patch100:	dhcp-4.2.2-ifup.patch
+Patch101:	dhcp-4.2.2-fix-format-errors.patch
 # prevents needless deassociation, working around mdv bug #43441
-Patch7:		dhcp-4.1.1-prevent_wireless_deassociation.patch
-# redhat bug #587070
-Patch9:		dhcp-4.1.1-useless-wait.patch
-Patch10:	dhcp-4.2.1-P1-CVE-2011-2748,2749.diff
-BuildRequires:	perl groff-for-man
+Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
+# fedora patches
+Patch8:		dhcp-4.2.2-xen-checksum.patch
+Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
+Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
+Patch18:	dhcp-4.2.1-64_bit_lease_parse.patch
+BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
-Provides:	dhcpd
-Obsoletes:	dhcpd < 3.0.6
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description 
@@ -84,11 +84,9 @@ DHCP server and a DHCP relay agent.
 %package server
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
-Requires:	dhcp-common = %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
-Obsoletes:	dhcp < 3.0.6
-Provides:	dhcp
 
 %description server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
@@ -101,7 +99,7 @@ network. You will also need to install the base dhcp package.
 %package client
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
-Requires:	dhcp-common = %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
 
 %description client
 DHCP client is the Internet Software Consortium (ISC) DHCP client for various
@@ -115,7 +113,7 @@ install the base dhcp package.
 %package relay
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
-Requires:	dhcp-common = %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
 
@@ -131,7 +129,7 @@ starting the server.
 %package devel
 Summary:	Development headers and libraries for the dhcpctl API
 Group:		Development/Other
-Requires:	dhcp-common = %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
 
 %description devel
 DHCP devel contains all of the libraries and headers for developing with the
@@ -139,15 +137,23 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
 
-%setup -q -n %{name}-%{version}-%{pver} -a4
-%patch0 -p1 -b .ifup
-%patch5 -p1 -b .format_not_a_string_literal_and_no_format_arguments
-%patch6 -p1 -b .noipv6nonfatal
-%patch7 -p1 -b .prevent_wireless_deassociation
-%patch9 -p0 -b .useless_wait
-%patch10 -p1 -b .CVE-2011-2748,2749
+%setup -q
+%patch100 -p1 -b .ifup
+%patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
+%patch102 -p1 -b .prevent_wireless_deassociation
 
-install -m0644 %{SOURCE12} doc
+# Handle Xen partial UDP checksums
+%patch8 -p1 -b .xen
+# If the ipv6 kernel module is missing, do not segfault
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19367])
+%patch15 -p1 -b .noipv6
+# Handle cases in add_timeout() where the function is called with a NULL
+# value for the 'when' parameter
+%patch17 -p1 -b .dracut
+# Ensure 64-bit platforms parse lease file dates & times correctly
+%patch18 -p1 -b .64-bit_lease_parse
+
+install -m0644 %{SOURCE10} doc
 
 %build
 %serverbuild
@@ -171,6 +177,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
+install -d %{buildroot}/lib/systemd/system
 install -d %{buildroot}%{_var}/lib/dhcp
 install -d %{buildroot}%{_var}/run/dhcpd
 
@@ -181,10 +188,13 @@ install -d %{buildroot}%{_var}/run/dhcpd
 %{__mv} %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
 %{__install} -p -m 0755 client/scripts/linux %{buildroot}/sbin/dhclient-script
 
-
-install -m0755 %{SOURCE3} %{buildroot}%{_initrddir}/dhcpd
-install -m0755 %{SOURCE5} %{buildroot}%{_initrddir}/dhcrelay
-install -m0755 %{SOURCE6} %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
+install -m0755 %{SOURCE11} %{buildroot}%{_initrddir}/dhcpd
+install -m0755 %{SOURCE13} %{buildroot}%{_initrddir}/dhcpd6
+install -m0755 %{SOURCE15} %{buildroot}%{_initrddir}/dhcrelay
+install -m 644 %{SOURCE12} %{buildroot}/lib/systemd/system/dhcpd
+install -m 644 %{SOURCE14} %{buildroot}/lib/systemd/system/dhcpd6
+install -m 644 %{SOURCE16} %{buildroot}/lib/systemd/system/dhcrelay
+install -m0755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
 install -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/
 install -m0755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}/
 
@@ -243,33 +253,14 @@ if [ ! -f %{_var}/lib/dhcp/dhcpd.leases ]; then
     touch %{_var}/lib/dhcp/dhcpd.leases
 fi
 
-if [ $1 = 0 ]; then
-	%{_initrddir}/dhcpd start
-fi
-
-#update an eventual installed dhcp-2* server
-if [ -f %{_sysconfdir}/dhcpd.conf ]; then
-	perl %{_sbindir}/update_dhcp.pl
-fi
-
 %preun server
 %_preun_service dhcpd
-
-%postun server
-if [ "$1" -ge "1" ]; then
-    /sbin/service dhcpd condrestart >/dev/null 2>&1  
-fi
 
 %post relay
 %_post_service dhcrelay
 
 %preun relay
 %_preun_service dhcrelay
-
-%postun relay
-if [ "$1" -ge "1" ]; then
-    /sbin/service dhcrelay condrestart >/dev/null 2>&1
-fi
 
 %post client
 touch /var/lib/dhcp/dhclient.leases
@@ -295,12 +286,14 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
 %{_initrddir}/dhcpd
+%{_initrddir}/dhcpd6
+/lib/systemd/system/dhcpd
+/lib/systemd/system/dhcpd6
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
 %config(noreplace) %ghost %{_var}/lib/dhcp/dhcpd.leases
 %{_sbindir}/dhcpd
-%{_sbindir}/update_dhcp.pl
 %{_sbindir}/dhcpreport.pl
 %{_sbindir}/dhcpd-conf-to-ldap
 %{_sbindir}/dhcpd-chroot.sh
@@ -316,6 +309,7 @@ rm -rf %{buildroot}
 %files relay
 %defattr(-,root,root)
 %{_initrddir}/dhcrelay
+/lib/systemd/system/dhcrelay
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
 %{_sbindir}/dhcrelay
 %{_mandir}/man8/dhcrelay.8*
