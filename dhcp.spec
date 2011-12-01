@@ -244,7 +244,7 @@ rm -rf doc/ja_JP.eucJP
 find -size 0 |grep ldap | xargs rm -rf 
 
 # remove unwanted file
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/dhclient.conf
+rm -f %{buildroot}%{_sysconfdir}/dhclient.conf
 
 %post server
 %_post_service dhcpd
