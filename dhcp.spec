@@ -301,7 +301,6 @@ rm -rf /var/lib/dhcp/dhclient.leases
 %{_sbindir}/dhcpd-chroot.sh
 %{_bindir}/omshell
 %{_mandir}/man1/omshell.1*
-%{_mandir}/man3/omapi.3*
 %{_mandir}/man5/dhcpd.conf.5*
 %{_mandir}/man5/dhcpd.leases.5*
 %{_mandir}/man5/dhcp-eval.5*
