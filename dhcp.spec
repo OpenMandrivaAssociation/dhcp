@@ -1,15 +1,23 @@
+%define plevelversion 1
+
+%if %plevelversion < 1
+%undefine plevel
+%else
+%define plevel P%{plevelversion}
+%endif
+
 %define _catdir /var/cache/man
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		3
 Version:	4.2.3
-Release:	%mkrel 0
+Release:	1.P%{plevelversion}.1
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}.tar.gz.sha512.asc
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
 Source7:	dhcpreport.pl
@@ -35,7 +43,6 @@ Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
 Patch18:	dhcp-4.2.1-64_bit_lease_parse.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description 
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
@@ -137,7 +144,8 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
 
-%setup -q
+%setup -q -n %{name}-%{version}%{?plevel:-%{plevel}}
+
 %patch100 -p1 -b .ifup
 %patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch102 -p1 -b .prevent_wireless_deassociation
@@ -268,22 +276,16 @@ touch /var/lib/dhcp/dhclient.leases
 %postun client
 rm -rf /var/lib/dhcp/dhclient.leases
 
-%clean
-rm -rf %{buildroot}
-
 %files common
-%defattr(-,root,root)
 %doc README contrib/ldap/README.ldap RELNOTES
 %doc contrib/3.0b1-lease-convert
 %dir %{_var}/lib/dhcp
 %{_mandir}/man5/dhcp-options.5*
 
 %files doc
-%defattr(-,root,root)
 %doc doc/*
 
 %files server
-%defattr(-,root,root)
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
 %{_initrddir}/dhcpd
 %{_initrddir}/dhcpd6
@@ -307,7 +309,6 @@ rm -rf %{buildroot}
 %dir %{_var}/run/dhcpd
 
 %files relay
-%defattr(-,root,root)
 %{_initrddir}/dhcrelay
 /lib/systemd/system/dhcrelay
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
@@ -315,7 +316,6 @@ rm -rf %{buildroot}
 %{_mandir}/man8/dhcrelay.8*
 
 %files client
-%defattr(-,root,root)
 %doc client/dhclient.conf
 %config(noreplace) %ghost %{_var}/lib/dhcp/dhclient.leases
 %attr (0755,root,root) /sbin/dhclient-script
@@ -326,7 +326,6 @@ rm -rf %{buildroot}
 %{_mandir}/man8/dhclient-script.8*
 
 %files devel
-%defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/*.a
 %{_mandir}/man3/*
