@@ -12,7 +12,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		3
 Version:	4.2.3
-Release:	1.P%{plevelversion}.1
+Release:	1.P%{plevelversion}.2
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
@@ -197,7 +197,7 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
-install -d %{buildroot}/lib/systemd/system
+install -d %{buildroot}%{_unitdir}/system
 install -d %{buildroot}%{_var}/lib/dhcp
 install -d %{buildroot}%{_var}/run/dhcpd
 
@@ -208,12 +208,16 @@ install -d %{buildroot}%{_var}/run/dhcpd
 %{__mv} %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
 %{__install} -p -m 0755 client/scripts/linux %{buildroot}/sbin/dhclient-script
 
+%if %mdkver >= 201100
+install -m 644 %{SOURCE12} %{buildroot}%{_unitdir}/dhcpd.service
+install -m 644 %{SOURCE14} %{buildroot}%{_unitdir}/dhcpd6.service
+install -m 644 %{SOURCE16} %{buildroot}%{_unitdir}/dhcrelay.service
+%else
 install -m0755 %{SOURCE11} %{buildroot}%{_initrddir}/dhcpd
 install -m0755 %{SOURCE13} %{buildroot}%{_initrddir}/dhcpd6
 install -m0755 %{SOURCE15} %{buildroot}%{_initrddir}/dhcrelay
-install -m 644 %{SOURCE12} %{buildroot}/lib/systemd/system/dhcpd
-install -m 644 %{SOURCE14} %{buildroot}/lib/systemd/system/dhcpd6
-install -m 644 %{SOURCE16} %{buildroot}/lib/systemd/system/dhcrelay
+%endif
+
 install -m0755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
 install -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/
 install -m0755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}/
@@ -225,14 +229,14 @@ cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd <<EOF
 # You can set here various option for dhcpd
 
 # Which configuration file to use.
-# CONFIGFILE="/etc/dhcpd.conf"
+CONFIGFILE="/etc/dhcpd.conf"
 
 # Where to store the lease state information.
-# LEASEFILE="/var/lib/dhcp/dhcpd.leases"
+LEASEFILE="/var/lib/dhcp/dhcpd.leases"
 
 # Define INTERFACES to limit which network interfaces dhcpd listens on.
 # The default null value causes dhcpd to listen on all interfaces.
-#INTERFACES=""
+INTERFACES=""
 
 # Define OPTIONS with any other options to pass to the dhcpd server.
 # See dhcpd(8) for available options and syntax.
@@ -299,10 +303,15 @@ rm -rf /var/lib/dhcp/dhclient.leases
 
 %files server
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
+
+%if %mdkver >= 201100
+%{_unitdir}/dhcpd.service
+%{_unitdir}/dhcpd6.service
+%else
 %{_initrddir}/dhcpd
 %{_initrddir}/dhcpd6
-/lib/systemd/system/dhcpd
-/lib/systemd/system/dhcpd6
+%endif
+
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
@@ -320,8 +329,13 @@ rm -rf /var/lib/dhcp/dhclient.leases
 %dir %{_var}/run/dhcpd
 
 %files relay
+
+%if %mdkver >= 201100
+%{_unitdir}/dhcrelay.service
+%else
 %{_initrddir}/dhcrelay
-/lib/systemd/system/dhcrelay
+%endif
+
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
 %{_sbindir}/dhcrelay
 %{_mandir}/man8/dhcrelay.8*
