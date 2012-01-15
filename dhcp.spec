@@ -1,4 +1,4 @@
-%define plevelversion 1
+%define plevelversion 2
 
 %if %plevelversion < 1
 %undefine plevel
@@ -43,6 +43,10 @@ Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
 Patch18:	dhcp-4.2.1-64_bit_lease_parse.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
+BuildRequires:	bind-devel
+%if %mdkver >= 201100
+BuildRequires:	systemd-units
+%endif
 
 %description 
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
@@ -94,6 +98,9 @@ Group:		System/Servers
 Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
+%if %mdkver >= 201100
+Requires(post,postun):	systemd-units
+%endif
 
 %description server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
@@ -164,7 +171,12 @@ Internet Software Consortium (ISC) dhcpctl API.
 install -m0644 %{SOURCE10} doc
 
 %build
+%if %mdkver >= 201200
+%serverbuild_hardened
+%else
 %serverbuild
+%endif
+
 %configure2_5x --enable-paranoia --enable-early-chroot \
     --with-ldapcrypto \
     --with-srv-lease-file=%{_var}/lib/dhcp/dhcpd.leases \
