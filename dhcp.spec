@@ -95,7 +95,7 @@ DHCP server and a DHCP relay agent.
 %package server
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
-Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{EVRD}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
 %if %mdkver >= 201100
@@ -113,7 +113,7 @@ network. You will also need to install the base dhcp package.
 %package client
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
-Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{EVRD}
 Provides:	dhcp-client-daemon
 
 %description client
@@ -128,7 +128,7 @@ install the base dhcp package.
 %package relay
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
-Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{EVRD}
 Requires(post):	rpm-helper
 Requires(preun): rpm-helper
 
@@ -144,7 +144,7 @@ starting the server.
 %package devel
 Summary:	Development headers and libraries for the dhcpctl API
 Group:		Development/Other
-Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
+Requires:	dhcp-common >= %{EVRD}
 
 %description devel
 DHCP devel contains all of the libraries and headers for developing with the
