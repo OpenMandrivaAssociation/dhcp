@@ -114,6 +114,7 @@ network. You will also need to install the base dhcp package.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
 Requires:	dhcp-common >= %{epoch}:%{version}-%{release}
+Provides:	dhcp-client-daemon
 
 %description client
 DHCP client is the Internet Software Consortium (ISC) DHCP client for various
