@@ -1,6 +1,6 @@
 %define plevelversion 2
 
-%if %plevelversion < 1
+%if %{plevelversion} < 1
 %undefine plevel
 %else
 %define plevel P%{plevelversion}
@@ -12,7 +12,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		3
 Version:	4.2.3
-Release:	1.P%{plevelversion}.2
+Release:	1.P%{plevelversion}.3
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
@@ -60,11 +60,11 @@ or pump or dhcpxd, which provides the DHCP client daemon, on client machines.
 If you want the DHCP server and/or relay, you will also need to install the
 dhcp-server and/or dhcp-relay packages.
 
-%package common
+%package	common
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 
-%description common
+%description	common
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
 individual devices on an IP network to get their own network 
 configuration information (IP address, subnetmask, broadcast address, 
@@ -77,11 +77,11 @@ dhcpxd, which provides the DHCP client daemon, on  client machines. If you
 want the DHCP server and/or relay, you will also need to install the
 dhcp-server and/or dhcp-relay packages.
 
-%package doc
+%package	doc
 Summary:	Documentation about the ISC DHCP server/client
 Group:		System/Servers
 
-%description doc
+%description	doc
 This package contains RFC/API/protocol documentation about the ISC
 DHCP server and client.
 
@@ -92,17 +92,17 @@ etc.) from a DHCP server.  The overall purpose of DHCP is to make it
 easier to administer a large network.  The dhcp package includes the 
 DHCP server and a DHCP relay agent.
 
-%package server
+%package	server
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Requires(post):	rpm-helper
-Requires(preun): rpm-helper
+Requires(preun):rpm-helper
 %if %mdkver >= 201100
 Requires(post,postun):	systemd-units
 %endif
 
-%description server
+%description	server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
 UNIX operating systems. It allows a UNIX mac hine to serve DHCP requests from
 the network.
@@ -110,13 +110,13 @@ the network.
 You should install dhcp-server if you want to set up a DHCP server on your
 network. You will also need to install the base dhcp package.
 
-%package client
+%package	client
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Provides:	dhcp-client-daemon
 
-%description client
+%description	client
 DHCP client is the Internet Software Consortium (ISC) DHCP client for various
 UNIX operating systems.  It allows a UNIX mac hine to obtain it's networking
 parameters from a DHCP server.
@@ -125,12 +125,12 @@ You should install dhcp-client if you want to use the ISC DHCP client instead
 of the Red Hat DHCP client, pump, or dhcpcd, or dhcpxd. You will also need to
 install the base dhcp package.
 
-%package relay
+%package	relay
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Requires(post):	rpm-helper
-Requires(preun): rpm-helper
+Requires(preun):rpm-helper
 
 %description relay
 DHCP relay is the Internet Software Consortium (ISC) relay agent for DHCP
@@ -141,17 +141,16 @@ takes care of this for the client. You will need to set the environment
 variable SERVERS and optionally OPTIONS in /etc/sysconfig/dhcrelay before
 starting the server.
 
-%package devel
+%package	devel
 Summary:	Development headers and libraries for the dhcpctl API
 Group:		Development/Other
 Requires:	dhcp-common >= %{EVRD}
 
-%description devel
+%description	devel
 DHCP devel contains all of the libraries and headers for developing with the
 Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
-
 %setup -q -n %{name}-%{version}%{?plevel:-%{plevel}}
 
 %patch100 -p1 -b .ifup
@@ -193,8 +192,6 @@ install -m0644 %{SOURCE10} doc
 %make
 
 %install
-rm -rf %{buildroot}
-
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
@@ -305,7 +302,7 @@ rm -rf /var/lib/dhcp/dhclient.leases
 %files server
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
 
-%if %mdkver >= 201100
+%if %{mdkver} >= 201100
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
 %else
