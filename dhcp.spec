@@ -94,7 +94,7 @@ Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Requires(post):	rpm-helper
 Requires(preun):rpm-helper
-%if %mdkver >= 201100
+%if %{mdkver} >= 201100
 Requires(post,postun):	systemd-units
 %endif
 
@@ -198,16 +198,12 @@ cp %{SOURCE10} doc
 install -p -m755 client/scripts/linux -D %{buildroot}/sbin/dhclient-script
 mv %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
 
-%if %{mdkver} >= 201100
 install -m644 %{SOURCE12} -D %{buildroot}%{_unitdir}/dhcpd.service
 install -m644 %{SOURCE14} -D %{buildroot}%{_unitdir}/dhcpd6.service
 install -m644 %{SOURCE16} -D %{buildroot}%{_unitdir}/dhcrelay.service
-%else
 install -m755 %{SOURCE11} -D %{buildroot}%{_initrddir}/dhcpd
 install -m755 %{SOURCE13} -D %{buildroot}%{_initrddir}/dhcpd6
 install -m755 %{SOURCE15} -D %{buildroot}%{_initrddir}/dhcrelay
-%endif
-
 
 install -m755 %{SOURCE7} -D %{buildroot}%{_sbindir}/dhcpreport.pl
 install -m755 %{SOURCE8} -D %{buildroot}%{_sbindir}/dhcpd-chroot.sh
@@ -299,14 +295,10 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 
 %files server
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
-%if %{mdkver} >= 201100
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
-%else
 %{_initrddir}/dhcpd
 %{_initrddir}/dhcpd6
-%endif
-
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
@@ -324,11 +316,8 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 %dir %{_var}/run/dhcpd
 
 %files relay
-%if %{mdkver} >= 201100
 %{_unitdir}/dhcrelay.service
-%else
 %{_initrddir}/dhcrelay
-%endif
 
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
 %{_sbindir}/dhcrelay
