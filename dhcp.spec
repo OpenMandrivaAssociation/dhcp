@@ -1,12 +1,8 @@
 %define plevelversion 2
 
-%if %{plevelversion} < 1
-%undefine plevel
-%else
+%if %{plevelversion} >= 1
 %define plevel P%{plevelversion}
 %endif
-
-%define _catdir /var/cache/man
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
@@ -44,7 +40,7 @@ Patch18:	dhcp-4.2.1-64_bit_lease_parse.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 BuildRequires:	bind-devel
-%if %mdkver >= 201100
+%if %{mdkver} >= 201100
 BuildRequires:	systemd-units
 %endif
 
@@ -132,13 +128,13 @@ Requires:	dhcp-common >= %{EVRD}
 Requires(post):	rpm-helper
 Requires(preun):rpm-helper
 
-%description relay
+%description	relay
 DHCP relay is the Internet Software Consortium (ISC) relay agent for DHCP
 packets. It is used on a subnet with DHCP clients to "relay" their requests
 to a subnet that has a DHCP server on it. Because DHCP packets can be
 broadcast, they will not be routed off of the local subnet. The DHCP relay
 takes care of this for the client. You will need to set the environment
-variable SERVERS and optionally OPTIONS in /etc/sysconfig/dhcrelay before
+variable SERVERS and optionally OPTIONS in %{_sysconfdir}/sysconfig/dhcrelay before
 starting the server.
 
 %package	devel
@@ -168,69 +164,68 @@ Internet Software Consortium (ISC) dhcpctl API.
 # Ensure 64-bit platforms parse lease file dates & times correctly
 %patch18 -p1 -b .64-bit_lease_parse
 
-install -m0644 %{SOURCE10} doc
+# remove empty files
+find -size 0 |grep ldap | xargs rm -rf 
+
+cp %{SOURCE10} doc
 
 %build
-%if %mdkver >= 201200
+%if %{mdkver} >= 201200
 %serverbuild_hardened
 %else
 %serverbuild
 %endif
 
-%configure2_5x --enable-paranoia --enable-early-chroot \
-    --with-ldapcrypto \
-    --with-srv-lease-file=%{_var}/lib/dhcp/dhcpd.leases \
-    --with-srv6-lease-file=%{_var}/lib/dhcp/dhcpd6.leases \
-    --with-cli-lease-file=%{_var}/lib/dhcp/dhclient.leases \
-    --with-cli6-lease-file=%{_var}/lib/dhcp/dhclient6.leases \
-    --with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
-    --with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
-    --with-cli-pid-file=%{_var}/run/dhclient.pid \
-    --with-cli6-pid-file=%{_var}/run/dhclient6.pid \
-    --with-relay-pid-file=%{_var}/run/dhcrelay.pid
+%configure2_5x	--enable-paranoia \
+		--enable-early-chroot \
+		--with-ldapcrypto \
+		--with-srv-lease-file=%{_localstatedir}/lib/dhcp/dhcpd.leases \
+		--with-srv6-lease-file=%{_localstatedir}/lib/dhcp/dhcpd6.leases \
+		--with-cli-lease-file=%{_localstatedir}/lib/dhcp/dhclient.leases \
+		--with-cli6-lease-file=%{_localstatedir}/lib/dhcp/dhclient6.leases \
+		--with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
+		--with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
+		--with-cli-pid-file=%{_var}/run/dhclient.pid \
+		--with-cli6-pid-file=%{_var}/run/dhclient6.pid \
+		--with-relay-pid-file=%{_var}/run/dhcrelay.pid
 
 %make
 
 %install
-install -d %{buildroot}%{_bindir}
-install -d %{buildroot}%{_sysconfdir}/sysconfig
-install -d %{buildroot}%{_initrddir}
-install -d %{buildroot}%{_unitdir}/system
-install -d %{buildroot}%{_var}/lib/dhcp
-install -d %{buildroot}%{_var}/run/dhcpd
-
 %makeinstall_std
 
 # Install correct dhclient-script
-%{__mkdir} -p %{buildroot}/sbin
-%{__mv} %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
-%{__install} -p -m 0755 client/scripts/linux %{buildroot}/sbin/dhclient-script
+install -p -m755 client/scripts/linux -D %{buildroot}/sbin/dhclient-script
+mv %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
 
-%if %mdkver >= 201100
-install -m 644 %{SOURCE12} %{buildroot}%{_unitdir}/dhcpd.service
-install -m 644 %{SOURCE14} %{buildroot}%{_unitdir}/dhcpd6.service
-install -m 644 %{SOURCE16} %{buildroot}%{_unitdir}/dhcrelay.service
+%if %{mdkver} >= 201100
+install -m644 %{SOURCE12} -D %{buildroot}%{_unitdir}/dhcpd.service
+install -m644 %{SOURCE14} -D %{buildroot}%{_unitdir}/dhcpd6.service
+install -m644 %{SOURCE16} -D %{buildroot}%{_unitdir}/dhcrelay.service
 %else
-install -m0755 %{SOURCE11} %{buildroot}%{_initrddir}/dhcpd
-install -m0755 %{SOURCE13} %{buildroot}%{_initrddir}/dhcpd6
-install -m0755 %{SOURCE15} %{buildroot}%{_initrddir}/dhcrelay
+install -m755 %{SOURCE11} -D %{buildroot}%{_initrddir}/dhcpd
+install -m755 %{SOURCE13} -D %{buildroot}%{_initrddir}/dhcpd6
+install -m755 %{SOURCE15} -D %{buildroot}%{_initrddir}/dhcrelay
 %endif
 
-install -m0755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}/
-install -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/
-install -m0755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}/
+
+install -m755 %{SOURCE7} -D %{buildroot}%{_sbindir}/dhcpreport.pl
+install -m755 %{SOURCE8} -D %{buildroot}%{_sbindir}/dhcpd-chroot.sh
+install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/dhcpd.conf
+install -m755 contrib/ldap/dhcpd-conf-to-ldap -D %{buildroot}%{_sbindir}/dhcpd-conf-to-ldap
 
 # install exit-hooks script to /etc/
-install -m0755 %{SOURCE9} %{buildroot}%{_sysconfdir}/
+install -m755 %{SOURCE9} -D %{buildroot}%{_sysconfdir}/dhclient-exit-hooks
 
+install -d %{buildroot}%{_sysconfdir}/sysconfig
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd <<EOF
 # You can set here various option for dhcpd
 
 # Which configuration file to use.
-CONFIGFILE="/etc/dhcpd.conf"
+CONFIGFILE="%{_sysconfdir}/dhcpd.conf"
 
 # Where to store the lease state information.
-LEASEFILE="/var/lib/dhcp/dhcpd.leases"
+LEASEFILE="%{_localstatedir}/lib/dhcp/dhcpd.leases"
 
 # Define INTERFACES to limit which network interfaces dhcpd listens on.
 # The default null value causes dhcpd to listen on all interfaces.
@@ -242,8 +237,11 @@ OPTIONS="-q"
 
 EOF
 
-touch %{buildroot}%{_var}/lib/dhcp/dhcpd.leases
-touch %{buildroot}%{_var}/lib/dhcp/dhclient.leases
+install -d %{buildroot}%{_localstatedir}/lib/dhcp
+install -d %{buildroot}%{_var}/run/dhcpd
+
+touch %{buildroot}%{_localstatedir}/lib/dhcp/dhcpd.leases
+touch %{buildroot}%{_localstatedir}/lib/dhcp/dhclient.leases
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcrelay <<EOF
 # Define SERVERS with a list of one or more DHCP servers where
@@ -271,8 +269,8 @@ rm -f %{buildroot}%{_sysconfdir}/dhclient.conf
 %post server
 %_post_service dhcpd
 # New dhcpd lease file
-if [ ! -f %{_var}/lib/dhcp/dhcpd.leases ]; then
-    touch %{_var}/lib/dhcp/dhcpd.leases
+if [ ! -f %{_localstatedir}/lib/dhcp/dhcpd.leases ]; then
+    touch %{_localstatedir}/lib/dhcp/dhcpd.leases
 fi
 
 %preun server
@@ -285,15 +283,15 @@ fi
 %_preun_service dhcrelay
 
 %post client
-touch /var/lib/dhcp/dhclient.leases
+touch %{_localstatedir}/lib/dhcp/dhclient.leases
 
 %postun client
-rm -rf /var/lib/dhcp/dhclient.leases
+rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 
 %files common
 %doc README contrib/ldap/README.ldap RELNOTES
 %doc contrib/3.0b1-lease-convert
-%dir %{_var}/lib/dhcp
+%dir %{_localstatedir}/lib/dhcp
 %{_mandir}/man5/dhcp-options.5*
 
 %files doc
@@ -301,7 +299,6 @@ rm -rf /var/lib/dhcp/dhclient.leases
 
 %files server
 %doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
-
 %if %{mdkver} >= 201100
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
@@ -313,7 +310,7 @@ rm -rf /var/lib/dhcp/dhclient.leases
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
-%config(noreplace) %ghost %{_var}/lib/dhcp/dhcpd.leases
+%config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhcpd.leases
 %{_sbindir}/dhcpd
 %{_sbindir}/dhcpreport.pl
 %{_sbindir}/dhcpd-conf-to-ldap
@@ -327,8 +324,7 @@ rm -rf /var/lib/dhcp/dhclient.leases
 %dir %{_var}/run/dhcpd
 
 %files relay
-
-%if %mdkver >= 201100
+%if %{mdkver} >= 201100
 %{_unitdir}/dhcrelay.service
 %else
 %{_initrddir}/dhcrelay
@@ -340,7 +336,7 @@ rm -rf /var/lib/dhcp/dhclient.leases
 
 %files client
 %doc client/dhclient.conf
-%config(noreplace) %ghost %{_var}/lib/dhcp/dhclient.leases
+%config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
 %attr (0755,root,root) /sbin/dhclient-script
 /sbin/dhclient
 %{_mandir}/man5/dhclient.conf.5*
