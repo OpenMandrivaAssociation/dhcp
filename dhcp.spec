@@ -1,4 +1,4 @@
-%define plevelversion 2
+%define plevelversion 1
 
 %if %{plevelversion} >= 1
 %define plevel P%{plevelversion}
@@ -7,8 +7,8 @@
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		3
-Version:	4.2.3
-Release:	1.P%{plevelversion}.3
+Version:	4.2.4
+Release:	0.P%{plevelversion}.1
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
