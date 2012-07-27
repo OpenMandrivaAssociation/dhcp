@@ -36,7 +36,8 @@ Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 Patch8:		dhcp-4.2.2-xen-checksum.patch
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
 Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
-Patch18:	dhcp-4.2.1-64_bit_lease_parse.patch
+Patch18:	dhcp-4.2.4-64_bit_lease_parse.patch
+BuildRequires:	autoconf automake libtool
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 BuildRequires:	bind-devel
@@ -153,6 +154,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch102 -p1 -b .prevent_wireless_deassociation
 
+
 # Handle Xen partial UDP checksums
 %patch8 -p1 -b .xen
 # If the ipv6 kernel module is missing, do not segfault
@@ -170,24 +172,26 @@ find -size 0 |grep ldap | xargs rm -rf
 cp %{SOURCE10} doc
 
 %build
+autoreconf -fi
 %if %{mdkver} >= 201200
 %serverbuild_hardened
 %else
 %serverbuild
 %endif
 
-%configure2_5x	--enable-paranoia \
-		--enable-early-chroot \
-		--with-ldapcrypto \
-		--with-srv-lease-file=%{_localstatedir}/lib/dhcp/dhcpd.leases \
-		--with-srv6-lease-file=%{_localstatedir}/lib/dhcp/dhcpd6.leases \
-		--with-cli-lease-file=%{_localstatedir}/lib/dhcp/dhclient.leases \
-		--with-cli6-lease-file=%{_localstatedir}/lib/dhcp/dhclient6.leases \
-		--with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
-		--with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
-		--with-cli-pid-file=%{_var}/run/dhclient.pid \
-		--with-cli6-pid-file=%{_var}/run/dhclient6.pid \
-		--with-relay-pid-file=%{_var}/run/dhcrelay.pid
+%configure2_5x \
+    --enable-paranoia \
+    --enable-early-chroot \
+    --with-ldapcrypto \
+    --with-srv-lease-file=%{_localstatedir}/lib/dhcp/dhcpd.leases \
+    --with-srv6-lease-file=%{_localstatedir}/lib/dhcp/dhcpd6.leases \
+    --with-cli-lease-file=%{_localstatedir}/lib/dhcp/dhclient.leases \
+    --with-cli6-lease-file=%{_localstatedir}/lib/dhcp/dhclient6.leases \
+    --with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
+    --with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
+    --with-cli-pid-file=%{_var}/run/dhclient.pid \
+    --with-cli6-pid-file=%{_var}/run/dhclient6.pid \
+    --with-relay-pid-file=%{_var}/run/dhcrelay.pid
 
 %make
 
