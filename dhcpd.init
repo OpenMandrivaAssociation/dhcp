@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+# dhcpd         This shell script takes care of starting and stopping
+#               dhcpd.
+#
+# chkconfig: 345 65 35
+# description: dhcpd provides the Dynamic Host Configuration Protocol service.
+#
+# processname: dhcpd
+# config: /etc/dhcpd.conf
+# pidfile: /var/run/dhcpd/dhcpd.pid
+#
+### BEGIN INIT INFO
+# Provides: dhcpd
+# Required-Start: $network
+# Should-Start: ldap
+# Required-Stop: $network
+# Should-Stop: ldap
+# Short-Description: The dhcpd daemon
+# Description: dhcpd provides the Dynamic Host Configuration Protocol service.
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+[ -x /usr/sbin/dhcpd ] || exit 0
+
+# The following variables should be set in the file
+# /etc/sysconfig/dhcpd.
+
+# Which configuration file to use.
+CONFIGFILE="/etc/dhcpd.conf"
+# Where to store the lease state information.
+LEASEFILE="/var/lib/dhcp/dhcpd.leases"
+# Define INTERFACES to limit which network interfaces dhcpd listens on.
+# The default null value causes dhcpd to listen on all interfaces.
+INTERFACES=""
+# Define OPTIONS with any other options to pass to the dhcpd server.
+OPTIONS="-q"
+
+# Source dhcpd configuration.  Values specified in this file override
+# the defaults above.
+[ -f /etc/sysconfig/dhcpd ] && . /etc/sysconfig/dhcpd
+
+# If null values were specified, use defaults so we don't get a syntax
+# error below.
+[ "${CONFIGFILE}" = "" ] && CONFIGFILE="/etc/dhcpd.conf"
+[ "${LEASEFILE}" = "" ] && LEASEFILE="/var/lib/dhcp/dhcpd.leases"
+
+[ -f $CONFIGFILE ] || exit 0
+[ -f $LEASEFILE ] || exit 0
+
+RETVAL=0
+
+start() {
+	# Start daemons.
+	echo -n "Starting dhcpd: "
+	if [ -n "${ROOTDIR}" -a "x${ROOTDIR}" != "x/" ]; then
+		OPTIONS="${OPTIONS} -chroot ${ROOTDIR}"
+	fi
+	daemon /usr/sbin/dhcpd -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/dhcpd
+	return $RETVAL
+}
+
+stop() {
+	# Stop daemons.
+	echo -n "Shutting down dhcpd: "
+	if [ -r ${ROOTDIR}/var/run/dhcpd/dhcpd.pid ]; then
+	    kill -TERM `cat ${ROOTDIR}/var/run/dhcpd/dhcpd.pid`
+	    RETVAL=$?
+	    [ "$RETVAL" = 0 ] && success "stop" || failure "stop"
+	else
+	    success "already stopped"
+	    RETVAL=0
+	fi
+        [ $RETVAL -eq 0 ] && rm -f ${ROOTDIR}/var/run/dhcpd/dhcpd.pid
+	[ $RETVAL = 0 ] && rm -f /var/lock/subsys/dhcpd
+	echo
+	return $RETVAL
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	RETVAL=$?
+	;;
+  condrestart)
+	if [ -f /var/lock/subsys/dhcpd ]; then
+	    stop
+	    start
+	    RETVAL=$?
+	fi
+	;;
+  status)
+	status dhcpd
+	RETVAL=$?
+	;;
+  *)
+	echo "Usage: dhcpd {start|stop|restart|condrestart|status}"
+	exit 1
+esac
+
+exit $RETVAL

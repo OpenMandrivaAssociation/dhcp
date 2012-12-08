@@ -1,0 +1,17 @@
+--- client/dhclient.c	2010/04/28 19:13:43	1.1
++++ client/dhclient.c	2010/04/28 19:17:01
+@@ -594,9 +594,12 @@
+ 				else {
+ 					client->state = S_INIT;
+ 					/* Set up a timeout to start the
+-					 * initialization process.
++					 * initialization process,
++					 * _immediately_, as agreed but never
++					 * applied by the ISC upstream
++	  https://lists.isc.org/mailman/htdig/dhcp-users/2006-June/thread.html#928
+ 					 */
+-					tv.tv_sec = cur_time + random() % 5;
++					tv.tv_sec = cur_time - 1;
+ 					tv.tv_usec = 0;
+ 					add_timeout(&tv, state_reboot,
+ 						    client, 0, 0);

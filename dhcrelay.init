@@ -1,0 +1,103 @@
+#!/bin/sh
+#
+# dhcrelay      This shell script takes care of starting and stopping
+#               dhcrelay.
+#
+# chkconfig: 2345 65 35
+# description: dhcrelay provides the DHCP Relay service.
+#
+# processname: dhcrelay
+# pidfile: /var/run/dhcrelay.pid
+#
+### BEGIN INIT INFO
+# Provides: dhcrelay
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 2 3 4 5
+# Short-Description: The dhcrelay daemon
+# Description: dhcrelay provides the DHCP Relay service.
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+[ -x /usr/sbin/dhcrelay ] || exit 0
+
+# The following variables can be set in the file
+# /etc/sysconfig/dhcrelay.
+
+# Define SERVERS with a list of one or more DHCP servers where
+# DHCP packets are to be relayed to and from.  This is mandatory.
+#SERVERS="10.11.12.13 10.9.8.7"
+SERVERS=""
+
+# Define OPTIONS with any other options to pass to the dhcrelay server.
+# See dhcrelay(8) for available options and syntax.
+#OPTIONS="-q -i eth0 -i eth1"
+OPTIONS="-q"
+
+# Source dhcrelay configuration.  Values specified in this file override
+# the defaults above.
+[ -f /etc/sysconfig/dhcrelay ] && . /etc/sysconfig/dhcrelay
+
+# Check that at least one DHCP server to relay to was specified.
+[ "${SERVERS}" = "" ] && exit 0
+
+RETVAL=0
+
+start() {
+	# Start daemons.
+	echo -n "Starting dhcrelay: "
+	daemon /usr/sbin/dhcrelay $OPTIONS $SERVERS
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/dhcrelay
+	return $RETVAL
+}
+
+stop() {
+	# Stop daemons.
+	echo -n "Shutting down dhcrelay: "
+	killproc dhcrelay
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/dhcrelay
+	return $RETVAL
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	RETVAL=$?
+	;;
+  condrestart)
+	if [ -f /var/lock/subsys/dhcrelay ]; then
+	    stop
+	    start
+	    RETVAL=$?
+	fi
+	;;
+  status)
+	status dhcrelay
+	RETVAL=$?
+	;;
+  *)
+	echo "Usage: dhcrelay {start|stop|restart|condrestart|status}"
+	exit 1
+esac
+
+exit $RETVAL

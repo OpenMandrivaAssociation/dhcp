@@ -1,15 +1,3 @@
 sources:
-  "dhclient-exit-hooks:"	d06aaabe8178ff1ecf3dac90efacfc6cc21faa4d
-  "dhcp-4.2.4-P1.tar.gz:"	0fe0f20b7be597d60e61951d2ccafe547d3bcec2
-  "dhcp-4.2.4-P1.tar.gz.sha512.asc:"	fc2bd3290452930fda94a673a1ff0f402f0b7c50
-  "dhcpd6.init:"	afbc175088909e96fc3536230e057ce5d231d5b6
-  "dhcpd6.service:"	e09c7af6c5f1ed2df1bbd4e879bb688374cb3173
-  "dhcpd-chroot.sh:"	f44b43413053186813dc71d9d15b8859978193fb
-  "dhcpd.conf:"	6766d91a9bb6e24ea0e2612cd6a02d9af83d62d8
-  "dhcpd.init:"	929752a2a0f07aa08585a9e4222a6c80e2aede81
-  "dhcpd.service:"	dea4678f0f87c3cb7392ebf0cc529cc1971a65f9
-  "dhcp-dynamic-dns-examples.tar.bz2:"	d33980aad3e0380fc89f8346ab37786d39157696
-  "dhcpreport.pl:"	e8d587151cbdb513e50d3180281ba92a264dcbd1
-  "dhcrelay.init:"	357daa03026bfe2baeaa9ac177a8f6c12eeebffc
-  "dhcrelay.service:"	cfe03efe520c60748e020b638fbceed6ddaa60e6
-  "draft-ietf-dhc-ldap-schema-01.txt:"	397f907b1d77ec5081c9b78281303a900175f9e3
+  "dhcp-4.2.1-P1.tar.gz": 7767019313b4128357054a1eb053c66799831dd6
+  "dhcp-dynamic-dns-examples.tar.bz2": d33980aad3e0380fc89f8346ab37786d39157696
