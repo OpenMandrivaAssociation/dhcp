@@ -6,7 +6,7 @@
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
-Epoch:		3
+Epoch:		4
 Version:	4.2.4
 Release:	0.P%{plevelversion}.1
 License:	Distributable
@@ -166,13 +166,14 @@ Internet Software Consortium (ISC) dhcpctl API.
 # Ensure 64-bit platforms parse lease file dates & times correctly
 %patch18 -p1 -b .64-bit_lease_parse
 
+autoreconf -fi
+
 # remove empty files
 find -size 0 |grep ldap | xargs rm -rf 
 
 cp %{SOURCE10} doc
 
 %build
-autoreconf -fi
 %if %{mdkver} >= 201200
 %serverbuild_hardened
 %else
