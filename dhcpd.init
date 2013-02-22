@@ -1,0 +1,118 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: dhcpd
+# Default-Start:
+# Default-Stop: 0 6
+# Should-Start: ldap
+# Required-Start: $network
+# Should-Stop: ldap
+# Required-Stop:
+# Short-Description: Start and stop the DHCP server
+# Description: dhcpd provides the Dynamic Host Configuration Protocol (DHCP)
+#              server.
+### END INIT INFO
+#
+# The fields below are left around for legacy tools (will remove later).
+#
+# chkconfig: - 65 35
+# description: dhcpd provides the Dynamic Host Configuration Protocol (DHCP) \
+#              server
+# processname: dhcpd
+# config: /etc/dhcpd.conf
+# config: /var/lib/dhcpd/dhcpd.leases
+# pidfile: /var/run/dhcpd.pid
+
+. /etc/rc.d/init.d/functions
+
+[ -x /usr/sbin/dhcpd ] || exit 0
+
+# Which configuration file to use.
+CONFIGFILE="/etc/dhcpd.conf"
+# Where to store the lease state information.
+LEASEFILE="/var/lib/dhcp/dhcpd.leases"
+# Define INTERFACES to limit which network interfaces dhcpd listens on.
+# The default null value causes dhcpd to listen on all interfaces.
+INTERFACES=""
+# Define OPTIONS with any other options to pass to the dhcpd server.
+OPTIONS="-q"
+
+# Values specified in this file override the defaults above.
+[ -f /etc/sysconfig/dhcpd ] && . /etc/sysconfig/dhcpd
+
+[ -f $CONFIGFILE ] || exit 0
+[ -f $LEASEFILE ] || exit 0
+
+RETVAL=0
+
+start() {
+    echo -n "Starting dhcpd: "
+    if [ -n "${ROOTDIR}" -a "x${ROOTDIR}" != "x/" ]; then
+        OPTIONS="${OPTIONS} -chroot ${ROOTDIR}"
+    fi
+    daemon /usr/sbin/dhcpd -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/dhcpd
+    return $RETVAL
+}
+
+stop() {
+    echo -n "Shutting down dhcpd: "
+    if [ -r ${ROOTDIR}/var/run/dhcpd/dhcpd.pid ]; then
+        kill -TERM `cat ${ROOTDIR}/var/run/dhcpd/dhcpd.pid`
+        RETVAL=$?
+        [ "$RETVAL" = 0 ] && success "stop" || failure "stop"
+    else
+        success "already stopped"
+        RETVAL=0
+    fi
+    [ $RETVAL -eq 0 ] && rm -f ${ROOTDIR}/var/run/dhcpd/dhcpd.pid
+    [ $RETVAL = 0 ] && rm -f /var/lock/subsys/dhcpd
+    echo
+    return $RETVAL
+}
+
+configtest() {
+    /usr/sbin/dhcpd -q -t -cf $CONFIGFILE
+    RETVAL=$?
+    if [ $RETVAL -eq 1 ]; then
+        /usr/sbin/dhcpd -t -cf $CONFIGFILE
+    else
+        echo "Syntax: OK" >&2
+    fi
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload)
+        stop
+        start
+        RETVAL=$?
+        ;;
+    condrestart)
+        if [ -f /var/lock/subsys/dhcpd ]; then
+            stop
+            start
+            RETVAL=$?
+        fi
+        ;;
+    configtest)
+        configtest
+        ;;
+    status)
+        status dhcpd
+        RETVAL=$?
+        ;;
+    *)
+        echo "Usage: dhcpd {start|stop|restart|condrestart|status}"
+        exit 1
+esac
+
+exit $RETVAL

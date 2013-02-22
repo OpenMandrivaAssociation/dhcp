@@ -1,7 +1,5 @@
 sources:
   "dhclient-exit-hooks:"	d06aaabe8178ff1ecf3dac90efacfc6cc21faa4d
-  "dhcp-4.2.4-P1.tar.gz:"	0fe0f20b7be597d60e61951d2ccafe547d3bcec2
-  "dhcp-4.2.4-P1.tar.gz.sha512.asc:"	fc2bd3290452930fda94a673a1ff0f402f0b7c50
   "dhcpd6.init:"	afbc175088909e96fc3536230e057ce5d231d5b6
   "dhcpd6.service:"	e09c7af6c5f1ed2df1bbd4e879bb688374cb3173
   "dhcpd-chroot.sh:"	f44b43413053186813dc71d9d15b8859978193fb
@@ -13,3 +11,5 @@ sources:
   "dhcrelay.init:"	357daa03026bfe2baeaa9ac177a8f6c12eeebffc
   "dhcrelay.service:"	cfe03efe520c60748e020b638fbceed6ddaa60e6
   "draft-ietf-dhc-ldap-schema-01.txt:"	397f907b1d77ec5081c9b78281303a900175f9e3
+  dhcp-4.2.5.tar.gz: d029505509aee83ea28972d5d1c95dc4b5db99f1
+  dhcp-4.2.5.tar.gz.sha512.asc: ac49b30ef17acb36cc5603faa5d780e423aa0e06

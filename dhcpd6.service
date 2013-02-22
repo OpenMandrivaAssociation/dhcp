@@ -1,0 +1,10 @@
+[Unit]
+Description=DHCPv6 Server Daemon
+After=syslog.target network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/dhcpd6
+ExecStart=/usr/sbin/dhcpd -d 6 -cf $CONFIGFILE -lf $LEASEFILE $INTERFACES
+
+[Install]
+WantedBy=multi-user.target

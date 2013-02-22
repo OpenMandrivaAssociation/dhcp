@@ -1,19 +1,15 @@
-%define plevelversion 1
-
-%if %{plevelversion} >= 1
-%define plevel P%{plevelversion}
-%endif
+#define plevel	P1
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
-Epoch:		4
-Version:	4.2.4
-Release:	0.P%{plevelversion}.1
+Epoch:		3
+Version:	4.2.5
+Release:	%{?plevel:0.P%{plevel}.}1
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{name}-%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz.sha512.asc
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
 Source7:	dhcpreport.pl
@@ -265,7 +261,9 @@ rm -rf doc/ja_JP.eucJP
 find -size 0 |grep ldap | xargs rm -rf 
 
 # remove unwanted file
-rm -f %{buildroot}%{_sysconfdir}/dhclient.conf
+rm %{buildroot}%{_sysconfdir}/dhclient.conf*
+rm %{buildroot}%{_sysconfdir}/dhcpd.conf.example
+
 
 %post server
 %_post_service dhcpd
@@ -299,7 +297,7 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 %doc doc/*
 
 %files server
-%doc server/dhcpd.conf tests/failover contrib/ldap/dhcp.schema
+%doc tests/failover contrib/ldap/dhcp.schema
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
 %{_initrddir}/dhcpd
@@ -329,7 +327,6 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 %{_mandir}/man8/dhcrelay.8*
 
 %files client
-%doc client/dhclient.conf
 %config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
 %attr (0755,root,root) /sbin/dhclient-script
 /sbin/dhclient
