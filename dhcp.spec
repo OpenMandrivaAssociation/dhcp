@@ -7,7 +7,7 @@ Version:	4.2.5
 Release:	%{?plevel:0.P%{plevel}.}1
 License:	Distributable
 Group:		System/Servers
-URL:		http://www.isc.org/software/dhcp
+Url:		http://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz
 Source1:	ftp://ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
@@ -29,17 +29,22 @@ Patch101:	dhcp-4.2.2-fix-format-errors.patch
 # prevents needless deassociation, working around mdv bug #43441
 Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 # fedora patches
+# Handle Xen partial UDP checksums
 Patch8:		dhcp-4.2.2-xen-checksum.patch
+# If the ipv6 kernel module is missing, do not segfault
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19367])
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
+# Handle cases in add_timeout() where the function is called with a NULL
+# value for the 'when' parameter
 Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
+# Ensure 64-bit platforms parse lease file dates & times correctly
 Patch18:	dhcp-4.2.4-64_bit_lease_parse.patch
-BuildRequires:	autoconf automake libtool
-BuildRequires:	groff-for-man
-BuildRequires:	openldap-devel
-BuildRequires:	bind-devel
-%if %{mdkver} >= 201100
+
+BuildRequires:	libtool
+BuildRequires:	groff-base
 BuildRequires:	systemd-units
-%endif
+BuildRequires:	bind-devel
+BuildRequires:	openldap-devel
 
 %description 
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
@@ -89,11 +94,8 @@ DHCP server and a DHCP relay agent.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
-Requires(post):	rpm-helper
-Requires(preun):rpm-helper
-%if %{mdkver} >= 201100
+Requires(post,preun):	rpm-helper
 Requires(post,postun):	systemd-units
-%endif
 
 %description	server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
@@ -122,8 +124,7 @@ install the base dhcp package.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
-Requires(post):	rpm-helper
-Requires(preun):rpm-helper
+Requires(post,preun):	rpm-helper
 
 %description	relay
 DHCP relay is the Internet Software Consortium (ISC) relay agent for DHCP
@@ -144,24 +145,8 @@ DHCP devel contains all of the libraries and headers for developing with the
 Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
-%setup -q -n %{name}-%{version}%{?plevel:-%{plevel}}
-
-%patch100 -p1 -b .ifup
-%patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
-%patch102 -p1 -b .prevent_wireless_deassociation
-
-
-# Handle Xen partial UDP checksums
-%patch8 -p1 -b .xen
-# If the ipv6 kernel module is missing, do not segfault
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19367])
-%patch15 -p1 -b .noipv6
-# Handle cases in add_timeout() where the function is called with a NULL
-# value for the 'when' parameter
-%patch17 -p1 -b .dracut
-# Ensure 64-bit platforms parse lease file dates & times correctly
-%patch18 -p1 -b .64-bit_lease_parse
-
+%setup -qn %{name}-%{version}%{?plevel:-%{plevel}}
+%apply_patches
 autoreconf -fi
 
 # remove empty files
@@ -170,25 +155,20 @@ find -size 0 |grep ldap | xargs rm -rf
 cp %{SOURCE10} doc
 
 %build
-%if %{mdkver} >= 201200
 %serverbuild_hardened
-%else
-%serverbuild
-%endif
-
 %configure2_5x \
-    --enable-paranoia \
-    --enable-early-chroot \
-    --with-ldapcrypto \
-    --with-srv-lease-file=%{_localstatedir}/lib/dhcp/dhcpd.leases \
-    --with-srv6-lease-file=%{_localstatedir}/lib/dhcp/dhcpd6.leases \
-    --with-cli-lease-file=%{_localstatedir}/lib/dhcp/dhclient.leases \
-    --with-cli6-lease-file=%{_localstatedir}/lib/dhcp/dhclient6.leases \
-    --with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
-    --with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
-    --with-cli-pid-file=%{_var}/run/dhclient.pid \
-    --with-cli6-pid-file=%{_var}/run/dhclient6.pid \
-    --with-relay-pid-file=%{_var}/run/dhcrelay.pid
+	--enable-paranoia \
+	--enable-early-chroot \
+	--with-ldapcrypto \
+	--with-srv-lease-file=%{_localstatedir}/lib/dhcp/dhcpd.leases \
+	--with-srv6-lease-file=%{_localstatedir}/lib/dhcp/dhcpd6.leases \
+	--with-cli-lease-file=%{_localstatedir}/lib/dhcp/dhclient.leases \
+	--with-cli6-lease-file=%{_localstatedir}/lib/dhcp/dhclient6.leases \
+	--with-srv-pid-file=%{_var}/run/dhcpd/dhcpd.pid \
+	--with-srv6-pid-file=%{_var}/run/dhcpd/dhcpd6.pid \
+	--with-cli-pid-file=%{_var}/run/dhclient.pid \
+	--with-cli6-pid-file=%{_var}/run/dhclient6.pid \
+	--with-relay-pid-file=%{_var}/run/dhcrelay.pid
 
 %make
 
@@ -264,7 +244,6 @@ find -size 0 |grep ldap | xargs rm -rf
 rm %{buildroot}%{_sysconfdir}/dhclient.conf*
 rm %{buildroot}%{_sysconfdir}/dhcpd.conf.example
 
-
 %post server
 %_post_service dhcpd
 # New dhcpd lease file
@@ -328,7 +307,7 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 
 %files client
 %config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
-%attr (0755,root,root) /sbin/dhclient-script
+/sbin/dhclient-script
 /sbin/dhclient
 %{_mandir}/man5/dhclient.conf.5*
 %{_mandir}/man5/dhclient.leases.5*
