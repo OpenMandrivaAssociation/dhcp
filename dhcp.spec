@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		3
 Version:	4.2.5
-Release:	%{?plevel:0.P%{plevel}.}3
+Release:	%{?plevel:0.P%{plevel}.}4
 License:	Distributable
 Group:		System/Servers
 Url:		http://www.isc.org/software/dhcp
@@ -316,15 +316,14 @@ rm -rf %{_localstatedir}/lib/dhclient/dhclient.leases
 %{_unitdir}/dhcrelay.service
 %{_tmpfilesdir}/dhcrelay.conf
 %{_initrddir}/dhcrelay
-
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
-%{_tmpfilesdir}/dhclient.conf
 %{_sbindir}/dhcrelay
 %{_mandir}/man8/dhcrelay.8*
 
 %files client
 %config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
 %config(noreplace) %ghost %{_var}/lib/dhclient/dhclient.leases
+%{_tmpfilesdir}/dhclient.conf
 /sbin/dhclient-script
 /sbin/dhclient
 %{_mandir}/man5/dhclient.conf.5*
