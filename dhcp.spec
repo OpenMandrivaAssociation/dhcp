@@ -4,7 +4,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 Name:		dhcp
 Epoch:		3
 Version:	4.2.5
-Release:	%{?plevel:0.P%{plevel}.}2
+Release:	%{?plevel:0.P%{plevel}.}3
 License:	Distributable
 Group:		System/Servers
 Url:		http://www.isc.org/software/dhcp
@@ -23,6 +23,9 @@ Source13:	dhcpd6.init
 Source14:	dhcpd6.service
 Source15:	dhcrelay.init
 Source16:	dhcrelay.service
+Source17:	dhcpd.tmpfiles
+Source18:	dhclient.tmpfiles
+Source19:	dhcrelay.tmpfiles
 # mageia patches
 Patch100:	dhcp-4.2.2-ifup.patch
 Patch101:	dhcp-4.2.2-fix-format-errors.patch
@@ -182,6 +185,11 @@ mv %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
 install -m644 %{SOURCE12} -D %{buildroot}%{_unitdir}/dhcpd.service
 install -m644 %{SOURCE14} -D %{buildroot}%{_unitdir}/dhcpd6.service
 install -m644 %{SOURCE16} -D %{buildroot}%{_unitdir}/dhcrelay.service
+
+install -D -p -m 644 %{SOURCE17} %{buildroot}%{_tmpfilesdir}/dhcpd.conf
+install -D -p -m 644 %{SOURCE18} %{buildroot}%{_tmpfilesdir}/dhclient.conf
+install -D -p -m 644 %{SOURCE19} %{buildroot}%{_tmpfilesdir}/dhcrelay.conf
+
 install -m755 %{SOURCE11} -D %{buildroot}%{_initrddir}/dhcpd
 install -m755 %{SOURCE13} -D %{buildroot}%{_initrddir}/dhcpd6
 install -m755 %{SOURCE15} -D %{buildroot}%{_initrddir}/dhcrelay
@@ -190,6 +198,9 @@ install -m755 %{SOURCE7} -D %{buildroot}%{_sbindir}/dhcpreport.pl
 install -m755 %{SOURCE8} -D %{buildroot}%{_sbindir}/dhcpd-chroot.sh
 install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/dhcpd.conf
 install -m755 contrib/ldap/dhcpd-conf-to-ldap -D %{buildroot}%{_sbindir}/dhcpd-conf-to-ldap
+
+install -d %{buildroot}%{_var}/lib/dhclient
+touch %{buildroot}%{_var}/lib/dhclient/dhclient.leases
 
 # install exit-hooks script to /etc/
 install -m755 %{SOURCE9} -D %{buildroot}%{_sysconfdir}/dhclient-exit-hooks
@@ -246,6 +257,7 @@ rm %{buildroot}%{_sysconfdir}/dhcpd.conf.example
 
 %post server
 %_post_service dhcpd
+%tmpfiles_create dhcpd
 # New dhcpd lease file
 if [ ! -f %{_localstatedir}/lib/dhcp/dhcpd.leases ]; then
     touch %{_localstatedir}/lib/dhcp/dhcpd.leases
@@ -256,15 +268,17 @@ fi
 
 %post relay
 %_post_service dhcrelay
+%tmpfiles_create dhcrelay
 
 %preun relay
 %_preun_service dhcrelay
 
 %post client
-touch %{_localstatedir}/lib/dhcp/dhclient.leases
+%tmpfiles_create dhclient
+touch %{_localstatedir}/lib/dhclient/dhclient.leases
 
 %postun client
-rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
+rm -rf %{_localstatedir}/lib/dhclient/dhclient.leases
 
 %files common
 %doc README contrib/ldap/README.ldap RELNOTES
@@ -279,6 +293,7 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 %doc tests/failover contrib/ldap/dhcp.schema
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
+%{_tmpfilesdir}/dhcpd.conf
 %{_initrddir}/dhcpd
 %{_initrddir}/dhcpd6
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
@@ -299,20 +314,24 @@ rm -rf %{_localstatedir}/lib/dhcp/dhclient.leases
 
 %files relay
 %{_unitdir}/dhcrelay.service
+%{_tmpfilesdir}/dhcrelay.conf
 %{_initrddir}/dhcrelay
 
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
+%{_tmpfilesdir}/dhclient.conf
 %{_sbindir}/dhcrelay
 %{_mandir}/man8/dhcrelay.8*
 
 %files client
 %config(noreplace) %ghost %{_localstatedir}/lib/dhcp/dhclient.leases
+%config(noreplace) %ghost %{_var}/lib/dhclient/dhclient.leases
 /sbin/dhclient-script
 /sbin/dhclient
 %{_mandir}/man5/dhclient.conf.5*
 %{_mandir}/man5/dhclient.leases.5*
 %{_mandir}/man8/dhclient.8*
 %{_mandir}/man8/dhclient-script.8*
+%dir %{_var}/lib/dhclient
 
 %files devel
 %{_includedir}/*
