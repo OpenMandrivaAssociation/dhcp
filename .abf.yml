@@ -1,4 +1,6 @@
 sources:
+  dhcp-4.2.5-P1.tar.gz: 120b6e476b2ac0d35e1dc8dee53752c42449b925
+  dhcp-4.2.5-P1.tar.gz.sha512.asc: d43248ba82d8a2f393f2f6c283ea06fb2df38d18
   dhcp-4.2.5.tar.gz: d029505509aee83ea28972d5d1c95dc4b5db99f1
   dhcp-4.2.5.tar.gz.sha512.asc: ac49b30ef17acb36cc5603faa5d780e423aa0e06
   dhcp-dynamic-dns-examples.tar.bz2: d33980aad3e0380fc89f8346ab37786d39157696

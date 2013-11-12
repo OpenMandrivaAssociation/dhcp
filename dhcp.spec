@@ -1,4 +1,4 @@
-#define plevel	P1
+%define plevel	P1
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
@@ -8,8 +8,8 @@ Release:	%{?plevel:0.P%{plevel}.}4
 License:	Distributable
 Group:		System/Servers
 Url:		http://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz.sha512.asc
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{version}%{?plevel:-%{plevel}}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz
+Source1:	ftp://ftp.isc.org/isc/%{name}/%{version}%{?plevel:-%{plevel}}/%{name}-%{version}%{?plevel:-%{plevel}}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
 Source7:	dhcpreport.pl
