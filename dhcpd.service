@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 EnvironmentFile=/etc/sysconfig/dhcpd
-ExecStart=/usr/sbin/dhcpd -cf $CONFIGFILE -lf $LEASEFILE $INTERFACES
+ExecStart=/usr/sbin/dhcpd -d -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
 
 [Install]
 WantedBy=multi-user.target
