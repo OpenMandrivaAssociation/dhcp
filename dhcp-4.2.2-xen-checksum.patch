@@ -1,12 +1,12 @@
 diff -up dhcp-4.2.2b1/common/bpf.c.xen dhcp-4.2.2b1/common/bpf.c
 --- dhcp-4.2.2b1/common/bpf.c.xen	2009-11-20 02:48:59.000000000 +0100
 +++ dhcp-4.2.2b1/common/bpf.c	2011-07-01 14:00:16.936959001 +0200
-@@ -485,7 +485,7 @@ ssize_t receive_packet (interface, buf, 
- 		offset = decode_udp_ip_header (interface,
- 					       interface -> rbuf,
- 					       interface -> rbuf_offset,
+@@ -481,7 +481,7 @@
+ 		/* Decode the IP and UDP headers... */
+ 		offset = decode_udp_ip_header(interface, interface->rbuf,
+ 					       interface->rbuf_offset,
 -  					       from, hdr.bh_caplen, &paylen);
-+  					       from, hdr.bh_caplen, &paylen, 0);
++					       from, hdr.bh_caplen, &paylen, 0);
  
  		/* If the IP or UDP checksum was bad, skip the packet... */
  		if (offset < 0) {
@@ -25,10 +25,10 @@ diff -up dhcp-4.2.2b1/common/dlpi.c.xen dhcp-4.2.2b1/common/dlpi.c
 diff -up dhcp-4.2.2b1/common/lpf.c.xen dhcp-4.2.2b1/common/lpf.c
 --- dhcp-4.2.2b1/common/lpf.c.xen	2011-05-10 16:38:58.000000000 +0200
 +++ dhcp-4.2.2b1/common/lpf.c	2011-07-01 14:11:24.725748028 +0200
-@@ -29,19 +29,33 @@
+@@ -29,24 +29,38 @@
+ 
  #include "dhcpd.h"
  #if defined (USE_LPF_SEND) || defined (USE_LPF_RECEIVE)
- #include <sys/ioctl.h>
 +#include <sys/socket.h>
  #include <sys/uio.h>
  #include <errno.h>
@@ -42,7 +42,12 @@ diff -up dhcp-4.2.2b1/common/lpf.c.xen dhcp-4.2.2b1/common/lpf.c
  #include "includes/netinet/ip.h"
  #include "includes/netinet/udp.h"
  #include "includes/netinet/if_ether.h"
+ #endif
+ 
+ #if defined (USE_LPF_RECEIVE) || defined (USE_LPF_HWADDR)
+ #include <sys/ioctl.h>
  #include <net/if.h>
+ #endif
  
 +#ifndef PACKET_AUXDATA
 +#define PACKET_AUXDATA 8
@@ -57,9 +62,9 @@ diff -up dhcp-4.2.2b1/common/lpf.c.xen dhcp-4.2.2b1/common/lpf.c
 +};
 +#endif
 +
+ #if defined (USE_LPF_SEND) || defined (USE_LPF_RECEIVE)
  /* Reinitializes the specified interface after an address change.   This
     is not required for packet-filter APIs. */
- 
 @@ -67,10 +81,14 @@ int if_register_lpf (info)
  	struct interface_info *info;
  {
