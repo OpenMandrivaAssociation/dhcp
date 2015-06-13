@@ -40,9 +40,9 @@ diff -Naur -x '*.orig' dhcp-4.2.2/relay/dhcrelay.c dhcp-4.2.2-fix-format-errors/
 +		log_info("%s", copyright);
 +		log_info("%s", arr);
 +		log_info("%s", url);
- 	} else {
- 		quiet = 0;
+ 	} else 
  		log_perror = 0;
+
 diff -Naur -x '*.orig' dhcp-4.2.2/server/dhcpd.c dhcp-4.2.2-fix-format-errors/server/dhcpd.c
 --- dhcp-4.2.2/server/dhcpd.c	2011-04-21 16:08:15.000000000 +0200
 +++ dhcp-4.2.2-fix-format-errors/server/dhcpd.c	2011-08-29 19:08:55.563183419 +0200

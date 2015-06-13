@@ -1,10 +1,10 @@
-%define plevel	P1
+#define plevel	P1
 
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 Name:		dhcp
 Epoch:		3
-Version:	4.2.5
-Release:	%{?plevel:5.P%{plevel}.}4
+Version:	4.2.8
+Release:	%{?plevel:5.P%{plevel}.}1
 License:	Distributable
 Group:		System/Servers
 Url:		http://www.isc.org/software/dhcp
@@ -32,8 +32,6 @@ Patch101:	dhcp-4.2.2-fix-format-errors.patch
 # prevents needless deassociation, working around mdv bug #43441
 Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 # fedora patches
-# Handle Xen partial UDP checksums
-Patch8:		dhcp-4.2.2-xen-checksum.patch
 # If the ipv6 kernel module is missing, do not segfault
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19367])
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
@@ -41,7 +39,7 @@ Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
 # value for the 'when' parameter
 Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
 # Ensure 64-bit platforms parse lease file dates & times correctly
-Patch18:	dhcp-4.2.4-64_bit_lease_parse.patch
+Patch18:	dhcp-4.3.0-64_bit_lease_parse.patch
 
 BuildRequires:	libtool
 BuildRequires:	groff-base
