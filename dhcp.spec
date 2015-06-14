@@ -1,4 +1,4 @@
-%define major_version    4.3.0
+%define major_version    4.3.2
 %define patch_version    %{nil}
 
 Name:		dhcp
@@ -32,7 +32,6 @@ Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 Patch103:	dhcp-4.2.5-P1-man.patch
 # fedora patches
 Patch7:		dhcp-4.2.0-default-requested-options.patch
-Patch8:		dhcp-4.2.2-xen-checksum.patch
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
 Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
 Patch18:	dhcp-4.3.0-64_bit_lease_parse.patch
@@ -150,8 +149,6 @@ Internet Software Consortium (ISC) dhcpctl API.
 # Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search
 # to the list of default requested DHCP options
 %patch7 -p1 -b .requested
-# Handle Xen partial UDP checksums
-%patch8 -p1 -b .xen
 # If the ipv6 kernel module is missing, do not segfault
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19367])
 %patch15 -p1 -b .noipv6
