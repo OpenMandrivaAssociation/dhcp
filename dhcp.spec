@@ -26,7 +26,7 @@ Source18:	dhclient.tmpfiles
 Source19:	dhcrelay.tmpfiles
 # mageia patches
 Patch100:	dhcp-4.2.2-ifup.patch
-Patch101:	dhcp-4.2.2-fix-format-errors.patch
+Patch101:	dhcp-4.3.2-fix-format-errors.patch
 # prevents needless deassociation, working around mdv bug #43441
 Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 Patch103:	dhcp-4.2.5-P1-man.patch
