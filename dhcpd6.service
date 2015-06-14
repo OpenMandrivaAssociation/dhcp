@@ -1,6 +1,7 @@
 [Unit]
 Description=DHCPv6 Server Daemon
-After=syslog.target network.target
+After=syslog.target network-online.target
+Wants=network-online.target
 
 [Service]
 Environment=CONFIGFILE=/etc/dhcpd6.conf LEASEFILE=/var/lib/dhcp/dhcpd6.leases
