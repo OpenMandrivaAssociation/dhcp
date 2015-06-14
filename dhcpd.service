@@ -1,6 +1,7 @@
 [Unit]
 Description=DHCPv4 Server Daemon
-After=syslog.target network.target ldap.service
+After=syslog.target network-online.target ldap.service
+Wants=network-online.target
 
 [Service]
 Environment=CONFIGFILE=/etc/dhcpd.conf LEASEFILE=/var/lib/dhcp/dhcpd.leases
