@@ -3,7 +3,7 @@ Description=DHCPv4 Server Daemon
 After=syslog.target network.target ldap.service
 
 [Service]
-Environment=CONFIGFILE=/etc/dhcpd.conf LEASEFILE=/var/lib/dhcpd/dhcpd.leases
+Environment=CONFIGFILE=/etc/dhcpd.conf LEASEFILE=/var/lib/dhcp/dhcpd.leases
 EnvironmentFile=-/etc/sysconfig/dhcpd
 Type=forking
 PIDFile=/run/dhcpd/dhcpd.pid
