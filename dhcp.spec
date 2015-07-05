@@ -4,7 +4,7 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	3
+Release:	4
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -89,7 +89,6 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Requires(post,preun):	rpm-helper
-Requires(post,postun):	systemd-units
 
 %description	server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
@@ -104,7 +103,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Provides:	dhcp-client-daemon
-Requires(post,postun):	systemd-units
+Requires(post,postun):	rpm-helper
 
 %description	client
 DHCP client is the Internet Software Consortium (ISC) DHCP client for various
@@ -254,7 +253,6 @@ rm -f %{buildroot}%{_libdir}/*.a
 
 %post server
 %_post_service dhcpd
-%_tmpfilescreate dhcpd
 # New dhcpd lease file
 if [ ! -f %{_var}/lib/dhcpd/dhcpd.leases ]; then
     touch %{_var}/lib/dhcpd/dhcpd.leases
@@ -265,14 +263,12 @@ fi
 
 %post relay
 %_post_service dhcrelay
-%_tmpfilescreate dhcrelay
 
 %preun relay
 %_preun_service dhcrelay
 
 %post client
 touch %{_var}/lib/dhclient/dhclient.leases
-%_tmpfilescreate dhclient
 
 %postun client
 rm -rf %{_var}/lib/dhclient/dhclient.leases
