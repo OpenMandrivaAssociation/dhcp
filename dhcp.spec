@@ -251,24 +251,23 @@ rm -f %{buildroot}%{_sysconfdir}/dhclient.conf.example
 rm -f %{buildroot}%{_sysconfdir}/dhcpd.conf.example
 rm -f %{buildroot}%{_libdir}/*.a
 
+install -d %{buildroot}%{_presetdir}
+cat > %{buildroot}%{_presetdir}/86-dhcp-server.preset << EOF
+enable dhcpd.service
+EOF
+
+cat > %{buildroot}%{_presetdir}/86-dhcp-relay.preset << EOF
+enable dhcrelay.service
+EOF
+
 %pre server
 %_pre_useradd dhcpd /dev/null /bin/false
 
 %post server
-%_post_service dhcpd
 # New dhcpd lease file
 if [ ! -f %{_var}/lib/dhcpd/dhcpd.leases ]; then
     touch %{_var}/lib/dhcpd/dhcpd.leases
 fi
-
-%preun server
-%_preun_service dhcpd
-
-%post relay
-%_post_service dhcrelay
-
-%preun relay
-%_preun_service dhcrelay
 
 %post client
 touch %{_var}/lib/dhclient/dhclient.leases
@@ -286,6 +285,7 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 
 %files server
 %doc server/dhcpd.conf.example tests/failover contrib/ldap/dhcp.schema
+%{_presetdir}/86-dhcp-server.preset
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
 %{_tmpfilesdir}/dhcpd.conf
@@ -307,6 +307,7 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %config(noreplace) %ghost %{_var}/lib/dhcpd/dhcpd.leases
 
 %files relay
+%{_presetdir}/86-dhcp-relay.preset
 %{_unitdir}/dhcrelay.service
 %{_tmpfilesdir}/dhcrelay.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
