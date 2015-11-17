@@ -1,16 +1,15 @@
-%define major_version    4.3.2
+%define major_version    4.3.3
 %define patch_version    %{nil}
 
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	6
+Release:	1
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{patch_version}/%{name}-%{major_version}%{patch_version}.tar.gz
-Source1:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{patch_version}/%{name}-%{major_version}%{patch_version}.tar.gz.sha512.asc
 Source2:	dhcpd.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
 Source7:	dhcpreport.pl
