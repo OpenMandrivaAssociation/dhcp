@@ -4,7 +4,7 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	5
+Release:	6
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -55,6 +55,7 @@ dhcp-server and/or dhcp-relay packages.
 %package	common
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
+BuildArch:	noarch
 
 %description	common
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
@@ -72,6 +73,7 @@ dhcp-server and/or dhcp-relay packages.
 %package	doc
 Summary:	Documentation about the ISC DHCP server/client
 Group:		System/Servers
+BuildArch:	noarch
 
 %description	doc
 This package contains RFC/API/protocol documentation about the ISC
@@ -103,6 +105,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) client
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Provides:	dhcp-client-daemon
+Requires:	hostname
 Requires(post,postun):	rpm-helper
 
 %description	client
