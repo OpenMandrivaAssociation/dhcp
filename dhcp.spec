@@ -35,10 +35,10 @@ Patch7:		dhcp-default-requested-options.patch
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
 Patch17:	dhcp-add_timeout_when_NULL.patch
 Patch18:	dhcp-64_bit_lease_parse.patch
-#BuildRequires:	groff-for-man
-#BuildRequires:	openldap-devel
-#BuildRequires:	bind-devel
-#BuildRequires:	krb5-devel
+BuildRequires:	groff-for-man
+BuildRequires:	openldap-devel
+BuildRequires:	bind-devel
+BuildRequires:	krb5-devel
 Requires(post):	rpm-helper
 Requires(preun):	rpm-helper
 
