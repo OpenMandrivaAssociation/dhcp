@@ -1,16 +1,17 @@
-%define major_version    4.3.3
-%define patch_version    %{nil}
+%define major_version 4.3.4
+%define patch_version %{nil}
 
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	3
+Release:	1
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{patch_version}/%{name}-%{major_version}%{patch_version}.tar.gz
 Source2:	dhcpd.conf
+Source3:        dhcpd6.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
 Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
@@ -25,21 +26,23 @@ Source18:	dhclient.tmpfiles
 Source19:	dhcrelay.tmpfiles
 # mageia patches
 Patch100:	dhcp-4.2.2-ifup.patch
-Patch101:	dhcp-4.3.2-fix-format-errors.patch
+Patch101:	dhcp-4.3.4-fix-format-errors.patch
 # prevents needless deassociation, working around mdv bug #43441
 Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 Patch103:	dhcp-4.2.5-P1-man.patch
 # fedora patches
-Patch7:		dhcp-4.2.0-default-requested-options.patch
+Patch7:		dhcp-default-requested-options.patch
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
-Patch17:	dhcp-4.2.0-add_timeout_when_NULL.patch
-Patch18:	dhcp-4.3.0-64_bit_lease_parse.patch
-BuildRequires:	groff-for-man
-BuildRequires:	openldap-devel
+Patch17:	dhcp-add_timeout_when_NULL.patch
+Patch18:	dhcp-64_bit_lease_parse.patch
+#BuildRequires:	groff-for-man
+#BuildRequires:	openldap-devel
+#BuildRequires:	bind-devel
+#BuildRequires:	krb5-devel
 Requires(post):	rpm-helper
-Requires(preun): rpm-helper
+Requires(preun):	rpm-helper
 
-%description 
+%description
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
 individual devices on an IP network to get their own network configuration
 information (IP address, subnetmask, broadcast address, etc.) from a DHCP
@@ -163,8 +166,8 @@ install -m0644 %{SOURCE10} doc
 
 %build
 %serverbuild
-%configure --enable-paranoia --enable-early-chroot \
-    --with-ldapcrypto \
+%configure --enable-paranoia --enable-early-chroot --enable-binary-leases \
+    --with-ldap --with-ldapcrypto --with-ldap-gssapi \
     --with-srv-lease-file=%{_var}/lib/dhcpd/dhcpd.leases \
     --with-srv6-lease-file=%{_var}/lib/dhcpd/dhcpd6.leases \
     --with-cli-lease-file=%{_var}/lib/dhclient/dhclient.leases \
@@ -175,6 +178,7 @@ install -m0644 %{SOURCE10} doc
     --with-cli6-pid-file=/run/dhclient/dhclient6.pid \
     --with-relay-pid-file=/run/dhcrelay/dhcrelay.pid \
     --disable-static
+
 %make
 
 %install
@@ -196,6 +200,7 @@ install -D -p -m 644 %{SOURCE19} %{buildroot}%{_tmpfilesdir}/dhcrelay.conf
 
 install -m 755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}
 install -m 755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}
 
 # install exit-hooks script to /etc/
@@ -220,10 +225,33 @@ cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd <<EOF
 OPTIONS="-q"
 EOF
 
+cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd6 <<EOF
+# You can set here various option for dhcpd
+
+# Which configuration file to use.
+# CONFIGFILE="/etc/dhcpd6.conf"
+
+# Where to store the lease state information.
+# LEASEFILE="/var/lib/dhcpd/dhcpd6.leases"
+
+# Define INTERFACES to limit which network interfaces dhcpd listens on.
+# The default null value causes dhcpd to listen on all interfaces.
+#INTERFACES=""
+
+# Define OPTIONS with any other options to pass to the dhcpd server.
+# See dhcpd(8) for available options and syntax.
+OPTIONS="-q"
+EOF
+
 install -d %{buildroot}%{_var}/lib/dhcpd
 touch %{buildroot}%{_var}/lib/dhcpd/dhcpd.leases
+touch %{buildroot}%{_var}/lib/dhcpd/dhcpd6.leases
 install -d %{buildroot}%{_var}/lib/dhclient
 touch %{buildroot}%{_var}/lib/dhclient/dhclient.leases
+
+# Copy sample conf files into position (called by doc macro)
+cp -p doc/examples/dhclient-dhcpv6.conf client/dhclient6.conf.example
+cp -p doc/examples/dhcpd-dhcpv6.conf server/dhcpd6.conf.example
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcrelay <<EOF
 # Define SERVERS with a list of one or more DHCP servers where
@@ -268,6 +296,10 @@ if [ ! -f %{_var}/lib/dhcpd/dhcpd.leases ]; then
     touch %{_var}/lib/dhcpd/dhcpd.leases
 fi
 
+if [ ! -f %{_var}/lib/dhcpd/dhcpd6.leases ]; then
+    touch %{_var}/lib/dhcpd/dhcpd6.leases
+fi
+
 %post client
 touch %{_var}/lib/dhclient/dhclient.leases
 
@@ -283,12 +315,13 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %doc doc/*
 
 %files server
-%doc server/dhcpd.conf.example tests/failover contrib/ldap/dhcp.schema
+%doc server/dhcpd*.conf.example tests/failover contrib/ldap/dhcp.schema
 %{_presetdir}/86-dhcp-server.preset
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
 %{_tmpfilesdir}/dhcpd.conf
 %config(noreplace) %{_sysconfdir}/dhcpd.conf
+%config(noreplace) %{_sysconfdir}/dhcpd6.conf
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
 %{_sbindir}/dhcpd
@@ -304,6 +337,7 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %{_mandir}/man8/dhcpd.8*
 %dir %{_var}/lib/dhcpd
 %config(noreplace) %ghost %{_var}/lib/dhcpd/dhcpd.leases
+%config(noreplace) %ghost %{_var}/lib/dhcpd/dhcpd6.leases
 
 %files relay
 %{_presetdir}/86-dhcp-relay.preset
@@ -314,7 +348,7 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %{_mandir}/man8/dhcrelay.8*
 
 %files client
-%doc client/dhclient.conf.example
+%doc client/dhclient*.conf.example
 %attr (0755,root,root) /sbin/dhclient-script
 %{_tmpfilesdir}/dhclient.conf
 /sbin/dhclient

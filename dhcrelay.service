@@ -1,10 +1,14 @@
 [Unit]
 Description=DHCP Relay Agent Daemon
-After=syslog.target network.target
+Documentation=man:dhcrelay(8)
+Wants=network-online.target
+After=network-online.target
 
 [Service]
+Type=notify
 EnvironmentFile=/etc/sysconfig/dhcrelay
 ExecStart=/usr/sbin/dhcrelay -d --no-pid $DHCRELAYARGS
+StandardError=null
 
 [Install]
 WantedBy=multi-user.target
