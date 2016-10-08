@@ -179,7 +179,8 @@ install -m0644 %{SOURCE10} doc
     --with-relay-pid-file=/run/dhcrelay/dhcrelay.pid \
     --disable-static
 
-%make
+# (tpg) disable parallel build
+%make -j1
 
 %install
 %makeinstall_std
