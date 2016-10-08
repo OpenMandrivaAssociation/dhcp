@@ -325,6 +325,7 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %config(noreplace) %{_sysconfdir}/dhcpd6.conf
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
+%config(noreplace) %{_sysconfdir}/sysconfig/dhcpd6
 %{_sbindir}/dhcpd
 %{_sbindir}/dhcpreport.pl
 %{_sbindir}/dhcpd-conf-to-ldap
