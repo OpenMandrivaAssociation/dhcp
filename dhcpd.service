@@ -1,14 +1,17 @@
 [Unit]
 Description=DHCPv4 Server Daemon
-After=syslog.target network-online.target ldap.service
+Documentation=man:dhcpd(8) man:dhcpd.conf(5)
 Wants=network-online.target
+After=network-online.target
+After=time-sync.target
 
 [Service]
-Environment=CONFIGFILE=/etc/dhcpd.conf LEASEFILE=/var/lib/dhcp/dhcpd.leases
+Environment=CONFIGFILE=/etc/dhcpd.conf LEASEFILE=/var/lib/dhcpd/dhcpd.leases
 EnvironmentFile=-/etc/sysconfig/dhcpd
-Type=forking
+Type=notify
 PIDFile=/run/dhcpd/dhcpd.pid
 ExecStart=/usr/sbin/dhcpd -pf /run/dhcpd/dhcpd.pid -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
+StandardError=null
 
 [Install]
 WantedBy=multi-user.target

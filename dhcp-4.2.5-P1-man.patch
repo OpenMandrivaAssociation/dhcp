@@ -12,7 +12,7 @@ diff -Naur dhcp-4.2.5-P1/client/dhclient.conf.5 dhcp-4.2.5-P1.oden/client/dhclie
  that if you enter a \'request\' statement, you over-ride these defaults
  and these options will not be requested.
 @@ -713,7 +714,7 @@
-     supersede domain-search "fugue.com", "rc.vix.com", "home.vix.com";
+     supersede domain-search "example.com", "rc.isc.org", "home.isc.org";
      prepend domain-name-servers 127.0.0.1;
      request subnet-mask, broadcast-address, time-offset, routers,
 -	    domain-name, domain-name-servers, host-name;

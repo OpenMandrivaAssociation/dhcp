@@ -1,6 +1,7 @@
---- dhcp-4.3.0/common/parse.c.64-bit_lease_parse	2014-01-31 14:20:49.000000000 -0500
-+++ dhcp-4.3.0/common/parse.c	2014-06-15 11:48:48.559669323 -0400
-@@ -932,8 +932,8 @@ TIME
+diff -up dhcp-4.3.0a1/common/parse.c.64-bit_lease_parse dhcp-4.3.0a1/common/parse.c
+--- dhcp-4.3.0a1/common/parse.c.64-bit_lease_parse	2013-12-11 01:25:12.000000000 +0100
++++ dhcp-4.3.0a1/common/parse.c	2013-12-19 15:45:25.990771814 +0100
+@@ -938,8 +938,8 @@ TIME
  parse_date_core(cfile)
  	struct parse *cfile;
  {
@@ -11,7 +12,7 @@
  	const char *val;
  	enum dhcp_token token;
  	static int months[11] = { 31, 59, 90, 120, 151, 181,
-@@ -959,7 +959,7 @@ parse_date_core(cfile)
+@@ -965,7 +965,7 @@ parse_date_core(cfile)
  		}
  
  		skip_token(&val, NULL, cfile); /* consume number */
@@ -20,7 +21,7 @@
  
  		return((TIME)guess);
  	}
-@@ -987,7 +987,7 @@ parse_date_core(cfile)
+@@ -993,7 +993,7 @@ parse_date_core(cfile)
  	   somebody invents a time machine, I think we can safely disregard
  	   it.   This actually works around a stupid Y2K bug that was present
  	   in a very early beta release of dhcpd. */
@@ -29,16 +30,7 @@
  	if (year > 1900)
  		year -= 1900;
  
-@@ -1011,7 +1011,7 @@ parse_date_core(cfile)
- 		return((TIME)0);
- 	}
- 	skip_token(&val, NULL, cfile); /* consume month */	
--	mon = atoi(val) - 1;
-+	mon = atol(val) - 1;
- 
- 	/* Slash separating month from day... */
- 	token = peek_token(&val, NULL, cfile);
-@@ -1033,7 +1033,7 @@ parse_date_core(cfile)
+@@ -1039,7 +1039,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
  	skip_token(&val, NULL, cfile); /* consume day of month */
@@ -47,7 +39,7 @@
  
  	/* Hour... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1044,7 +1044,7 @@ parse_date_core(cfile)
+@@ -1050,7 +1050,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
  	skip_token(&val, NULL, cfile); /* consume hour */
@@ -56,7 +48,7 @@
  
  	/* Colon separating hour from minute... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1066,7 +1066,7 @@ parse_date_core(cfile)
+@@ -1072,7 +1072,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
  	skip_token(&val, NULL, cfile); /* consume minute */
@@ -65,7 +57,7 @@
  
  	/* Colon separating minute from second... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1088,13 +1088,13 @@ parse_date_core(cfile)
+@@ -1094,13 +1094,13 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
  	skip_token(&val, NULL, cfile); /* consume second */

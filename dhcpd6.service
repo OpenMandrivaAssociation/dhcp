@@ -1,14 +1,17 @@
 [Unit]
 Description=DHCPv6 Server Daemon
-After=syslog.target network-online.target
+Documentation=man:dhcpd(8) man:dhcpd.conf(5)
 Wants=network-online.target
+After=network-online.target
+After=time-sync.target
 
 [Service]
-Environment=CONFIGFILE=/etc/dhcpd6.conf LEASEFILE=/var/lib/dhcp/dhcpd6.leases
+Environment=CONFIGFILE=/etc/dhcpd6.conf LEASEFILE=/var/lib/dhcpd/dhcpd6.leases
 EnvironmentFile=-/etc/sysconfig/dhcpd6
-Type=forking
-PIDFile=/var/run/dhcpd6.pid
-ExecStart=/usr/sbin/dhcpd -6 -pf /var/run/dhcpd6.pid -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
+Type=notify
+PIDFile=/run/dhcpd/dhcpd6.pid
+ExecStart=/usr/sbin/dhcpd -6 -pf /run/dhcpd/dhcpd6.pid -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
+StandardError=null
 
 [Install]
 WantedBy=multi-user.target
