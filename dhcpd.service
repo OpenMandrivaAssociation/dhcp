@@ -9,8 +9,7 @@ After=time-sync.target
 Environment=CONFIGFILE=/etc/dhcpd.conf LEASEFILE=/var/lib/dhcpd/dhcpd.leases
 EnvironmentFile=-/etc/sysconfig/dhcpd
 Type=notify
-PIDFile=/run/dhcpd/dhcpd.pid
-ExecStart=/usr/sbin/dhcpd -pf /run/dhcpd/dhcpd.pid -cf $CONFIGFILE -lf $LEASEFILE $OPTIONS $INTERFACES
+ExecStart=/usr/sbin/dhcpd -f -cf $CONFIGFILE --no-pid -lf $LEASEFILE $OPTIONS $INTERFACES
 StandardError=null
 
 [Install]
