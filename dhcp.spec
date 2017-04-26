@@ -4,7 +4,7 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	2
+Release:	3
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -35,10 +35,12 @@ Patch7:		dhcp-default-requested-options.patch
 Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
 Patch17:	dhcp-add_timeout_when_NULL.patch
 Patch18:	dhcp-64_bit_lease_parse.patch
+Patch19:	dhcp-sd_notify.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 BuildRequires:	bind-devel
 BuildRequires:	krb5-devel
+BuildRequires:	pkgconfig(systemd)
 Requires(post):	rpm-helper
 Requires(preun):	rpm-helper
 
@@ -161,11 +163,14 @@ Internet Software Consortium (ISC) dhcpctl API.
 %patch17 -p1 -b .dracut
 # Ensure 64-bit platforms parse lease file dates & times correctly
 %patch18 -p1 -b .64-bit_lease_parse
+# Use notify systemd service
+%patch19 -p1
 
 install -m0644 %{SOURCE10} doc
 
 %build
 %serverbuild
+autoreconf -fiv
 %configure --enable-paranoia --enable-early-chroot --enable-binary-leases \
     --with-ldap --with-ldapcrypto --with-ldap-gssapi \
     --with-srv-lease-file=%{_var}/lib/dhcpd/dhcpd.leases \
@@ -177,7 +182,7 @@ install -m0644 %{SOURCE10} doc
     --with-cli-pid-file=/run/dhclient/dhclient.pid \
     --with-cli6-pid-file=/run/dhclient/dhclient6.pid \
     --with-relay-pid-file=/run/dhcrelay/dhcrelay.pid \
-    --disable-static
+    --disable-static --with-systemd
 
 # (tpg) disable parallel build
 %make -j1
