@@ -4,7 +4,7 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	3
+Release:	4
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -40,6 +40,7 @@ BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 BuildRequires:	bind-devel
 BuildRequires:	krb5-devel
+BuildRequires:	pkgconfig(libsasl2)
 BuildRequires:	pkgconfig(systemd)
 Requires(post):	rpm-helper
 Requires(preun):	rpm-helper
