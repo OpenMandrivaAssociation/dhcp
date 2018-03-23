@@ -41,6 +41,7 @@ BuildRequires:	openldap-devel
 BuildRequires:	bind-devel
 BuildRequires:	krb5-devel
 BuildRequires:	pkgconfig(libsasl2)
+BuildRequires:	pkgconfig(com_err)
 BuildRequires:	pkgconfig(systemd)
 Requires(post):	rpm-helper
 Requires(preun):	rpm-helper
