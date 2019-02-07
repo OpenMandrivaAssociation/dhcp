@@ -23,8 +23,8 @@ diff -up dhcp-4.3.4/relay/dhcrelay.c.sd_notify dhcp-4.3.4/relay/dhcrelay.c
 --- dhcp-4.3.4/relay/dhcrelay.c.sd_notify	2016-04-29 13:08:52.814287061 +0200
 +++ dhcp-4.3.4/relay/dhcrelay.c	2016-04-29 13:08:52.872287075 +0200
 @@ -37,6 +37,10 @@
- #include <sys/time.h>
- #include <isc/file.h>
+    int keep_capabilities = 0;
+ #endif
  
 +#ifdef HAVE_LIBSYSTEMD
 +#include <systemd/sd-daemon.h>
@@ -34,7 +34,7 @@ diff -up dhcp-4.3.4/relay/dhcrelay.c.sd_notify dhcp-4.3.4/relay/dhcrelay.c
  TIME max_lease_time = 86400; /* 24 hours... */
  struct tree_cache *global_options[256];
 @@ -709,6 +713,14 @@ main(int argc, char **argv) {
- 	signal(SIGTERM, dhcp_signal_handler);  /* kill */
+ 	}
  #endif
  
 +#ifdef HAVE_LIBSYSTEMD

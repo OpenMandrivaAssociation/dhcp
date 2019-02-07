@@ -25,24 +25,21 @@ Source17:	dhcpd.tmpfiles
 Source18:	dhclient.tmpfiles
 Source19:	dhcrelay.tmpfiles
 # mageia patches
-Patch100:	dhcp-4.2.2-ifup.patch
 Patch101:	dhcp-4.3.4-fix-format-errors.patch
-# prevents needless deassociation, working around mdv bug #43441
-Patch102:	dhcp-4.1.1-prevent_wireless_deassociation.patch
 Patch103:	dhcp-4.2.5-P1-man.patch
 # fedora patches
 Patch7:		dhcp-default-requested-options.patch
-Patch15:	dhcp-4.2.2-missing-ipv6-not-fatal.patch
 Patch17:	dhcp-add_timeout_when_NULL.patch
 Patch18:	dhcp-64_bit_lease_parse.patch
 Patch19:	dhcp-sd_notify.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 BuildRequires:	bind-devel
-BuildRequires:	krb5-devel
+BuildRequires:	pkgconfig(krb5)
 BuildRequires:	pkgconfig(libsasl2)
 BuildRequires:	pkgconfig(com_err)
 BuildRequires:	pkgconfig(systemd)
+BuildRequires:	rpm-helper
 Requires(post):	rpm-helper
 Requires(preun):	rpm-helper
 
@@ -149,17 +146,12 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
 %autosetup -n %{name}-%{major_version}%{patch_version}
-%patch100 -p1 -b .ifup
 %patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
-%patch102 -p1 -b .prevent_wireless_deassociation
 %patch103 -p1 -b .man
 
 # Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search
 # to the list of default requested DHCP options
 %patch7 -p1 -b .requested
-# If the ipv6 kernel module is missing, do not segfault
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19367])
-%patch15 -p1 -b .noipv6
 # Handle cases in add_timeout() where the function is called with a NULL
 # value for the 'when' parameter
 %patch17 -p1 -b .dracut
