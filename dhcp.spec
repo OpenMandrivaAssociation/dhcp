@@ -1,10 +1,10 @@
-%define major_version 4.3.5
+%define major_version 4.4.1
 %define patch_version %{nil}
 
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	5
+Release:	1
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -148,7 +148,7 @@ DHCP devel contains all of the libraries and headers for developing with the
 Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
-%setup -q -n %{name}-%{major_version}%{patch_version}
+%autosetup -n %{name}-%{major_version}%{patch_version}
 %patch100 -p1 -b .ifup
 %patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch102 -p1 -b .prevent_wireless_deassociation
@@ -187,10 +187,10 @@ autoreconf -fiv
     --disable-static --with-systemd
 
 # (tpg) disable parallel build
-%make -j1
+%make_build -j1
 
 %install
-%makeinstall_std
+%make_install
 
 # Install correct dhclient-script
 install -d %{buildroot}/sbin
