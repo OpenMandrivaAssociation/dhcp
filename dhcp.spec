@@ -145,7 +145,7 @@ DHCP devel contains all of the libraries and headers for developing with the
 Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
-%autosetup -qn %{name}-%{major_version}%{patch_version}
+%autosetup -n %{name}-%{major_version}%{patch_version}
 
 %patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch103 -p1 -b .man
