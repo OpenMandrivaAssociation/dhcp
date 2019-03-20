@@ -34,7 +34,7 @@ Patch18:	dhcp-64_bit_lease_parse.patch
 Patch19:	dhcp-sd_notify.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
-BuildRequires:	bind-devel
+#BuildRequires:	bind-devel
 BuildRequires:	pkgconfig(krb5)
 BuildRequires:	pkgconfig(libsasl2)
 BuildRequires:	pkgconfig(com_err)
