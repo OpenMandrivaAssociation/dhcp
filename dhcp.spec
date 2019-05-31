@@ -4,7 +4,7 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	1
+Release:	2
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -31,7 +31,7 @@ Patch103:	dhcp-4.2.5-P1-man.patch
 Patch7:		dhcp-default-requested-options.patch
 Patch17:	dhcp-add_timeout_when_NULL.patch
 Patch18:	dhcp-64_bit_lease_parse.patch
-Patch19:	dhcp-sd_notify.patch
+Patch19:	0022-Backport-sd-notify-patch-for-systemd-support-1687040.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 #BuildRequires:	bind-devel
