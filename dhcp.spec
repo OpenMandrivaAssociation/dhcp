@@ -164,6 +164,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 install -m0644 %{SOURCE10} doc
 
 %build
+%config_update
 %serverbuild
 autoreconf -fiv
 %configure --enable-paranoia --enable-early-chroot --enable-binary-leases \
