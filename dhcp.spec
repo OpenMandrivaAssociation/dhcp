@@ -164,7 +164,6 @@ Internet Software Consortium (ISC) dhcpctl API.
 install -m0644 %{SOURCE10} doc
 
 %build
-%config_update
 %serverbuild
 autoreconf -fiv
 %configure --enable-paranoia --enable-early-chroot --enable-binary-leases \
@@ -181,6 +180,7 @@ autoreconf -fiv
     --disable-static --with-systemd
 
 # (tpg) disable parallel build
+%config_update
 %make_build -j1
 
 %install
