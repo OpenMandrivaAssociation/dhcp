@@ -1,7 +1,9 @@
-diff -Naur -x '*.orig' dhcp-4.2.2/client/dhclient.c dhcp-4.2.2-fix-format-errors/client/dhclient.c
-@@ -153,9 +153,9 @@ static void
- usage(const char *sfmt, const char *sarg)
- {
+diff -up dhcp-4.4.2/relay/dhcrelay.c.format_not_a_string_literal_and_no_format_arguments dhcp-4.4.2/relay/dhcrelay.c
+--- dhcp-4.4.2/relay/dhcrelay.c.format_not_a_string_literal_and_no_format_arguments	2020-01-23 01:45:50.426322319 +0100
++++ dhcp-4.4.2/relay/dhcrelay.c	2020-01-23 01:46:28.863321107 +0100
+@@ -258,9 +258,9 @@ static const char use_v6command[] = "Com
+ static void
+ usage(const char *sfmt, const char *sarg) {
  	log_info("%s %s", message, PACKAGE_VERSION);
 -	log_info(copyright);
 -	log_info(arr);
@@ -12,39 +14,10 @@ diff -Naur -x '*.orig' dhcp-4.2.2/client/dhclient.c dhcp-4.2.2-fix-format-errors
  
  	/* If desired print out the specific error message */
  #ifdef PRINT_SPECIFIC_CL_ERRORS
-@@ -561,9 +561,9 @@ main(int argc, char **argv) {
- 
- 	if (!quiet) {
- 		log_info("%s %s", message, PACKAGE_VERSION);
--		log_info(copyright);
--		log_info(arr);
--		log_info(url);
-+		log_info("%s", copyright);
-+		log_info("%s", arr);
-+		log_info("%s", url);
- 		log_info("%s", "");
- 	} else {
- 		log_perror = 0;
-diff -Naur -x '*.orig' dhcp-4.2.2/relay/dhcrelay.c dhcp-4.2.2-fix-format-errors/relay/dhcrelay.c
---- dhcp-4.2.2/relay/dhcrelay.c	2011-05-10 15:07:37.000000000 +0200
-+++ dhcp-4.2.2-fix-format-errors/relay/dhcrelay.c	2011-08-29 19:08:55.561183444 +0200
-@@ -428,9 +428,9 @@
- 
- 	if (!quiet) {
- 		log_info("%s %s", message, PACKAGE_VERSION);
--		log_info(copyright);
--		log_info(arr);
--		log_info(url);
-+		log_info("%s", copyright);
-+		log_info("%s", arr);
-+		log_info("%s", url);
- 	} else 
- 		log_perror = 0;
- 
-diff -Naur -x '*.orig' dhcp-4.2.2/server/dhcpd.c dhcp-4.2.2-fix-format-errors/server/dhcpd.c
---- dhcp-4.2.2/server/dhcpd.c	2011-04-21 16:08:15.000000000 +0200
-+++ dhcp-4.2.2-fix-format-errors/server/dhcpd.c	2011-08-29 19:08:55.563183419 +0200
-@@ -398,9 +398,9 @@
+diff -up dhcp-4.4.2/server/dhcpd.c.format_not_a_string_literal_and_no_format_arguments dhcp-4.4.2/server/dhcpd.c
+--- dhcp-4.4.2/server/dhcpd.c.format_not_a_string_literal_and_no_format_arguments	2020-01-21 20:21:48.000000000 +0100
++++ dhcp-4.4.2/server/dhcpd.c	2020-01-23 01:45:50.426322319 +0100
+@@ -612,9 +612,9 @@ main(int argc, char **argv) {
  
  	if (!quiet) {
  		log_info("%s %s", message, PACKAGE_VERSION);
@@ -57,7 +30,7 @@ diff -Naur -x '*.orig' dhcp-4.2.2/server/dhcpd.c dhcp-4.2.2-fix-format-errors/se
  	} else {
  		log_perror = 0;
  	}
-@@ -1048,9 +1048,9 @@
+@@ -1333,9 +1333,9 @@ void postconf_initialization (int quiet)
  				tmp = log_perror;
  				log_perror = 0;
  				log_info("%s %s", message, PACKAGE_VERSION);
