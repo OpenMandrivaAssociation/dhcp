@@ -7,7 +7,7 @@ After=network-online.target
 [Service]
 Type=notify
 EnvironmentFile=/etc/sysconfig/dhcrelay
-ExecStart=/usr/sbin/dhcrelay -d --no-pid $DHCRELAYARGS
+ExecStart=/usr/sbin/dhcrelay -d --no-pid
 StandardError=null
 
 [Install]

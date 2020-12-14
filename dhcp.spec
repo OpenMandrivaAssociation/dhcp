@@ -4,14 +4,14 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	1
+Release:	2
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{patch_version}/%{name}-%{major_version}%{patch_version}.tar.gz
 Source2:	dhcpd.conf
-Source3:        dhcpd6.conf
+Source3:	dhcpd6.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
 Source7:	dhcpreport.pl
 Source8:	dhcpd-chroot.sh
@@ -27,6 +27,8 @@ Source19:	dhcrelay.tmpfiles
 # mageia patches
 Patch101:	dhcp-4.3.4-fix-format-errors.patch
 Patch103:	dhcp-4.2.5-P1-man.patch
+Patch104:	dhcp-4.4.2-gcc10.patch
+Patch105:	dhcp-4.4.1-var-run-to-run.patch
 # fedora patches
 Patch7:		dhcp-default-requested-options.patch
 Patch17:	dhcp-add_timeout_when_NULL.patch
@@ -256,15 +258,12 @@ cp -p doc/examples/dhclient-dhcpv6.conf client/dhclient6.conf.example
 cp -p doc/examples/dhcpd-dhcpv6.conf server/dhcpd6.conf.example
 
 cat > %{buildroot}%{_sysconfdir}/sysconfig/dhcrelay <<EOF
-# Define SERVERS with a list of one or more DHCP servers where
-# DHCP packets are to be relayed to and from.  This is mandatory.
-#SERVERS="10.11.12.13 10.9.8.7"
-SERVERS=""
-
-# Define OPTIONS with any other options to pass to the dhcrelay server.
+# Define DHCRELAYARGS with a list of one or more DHCP servers where
 # See dhcrelay(8) for available options and syntax.
-#OPTIONS="-q -i eth0 -i eth1"
-OPTIONS="-q"
+# Define at the end the servers with a list of one or more DHCP servers where
+# DHCP packets are to be relayed to and from.  This is mandatory. Replace xxxx with them
+#DHCRELAYARGS="-q -iu eth0 -id eth1 192.168.1.1"
+DHCRELAYARGS="-q"
 EOF
 
 find . -type d -exec chmod 0755 {} \;
