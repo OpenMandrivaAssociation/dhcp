@@ -151,6 +151,8 @@ Internet Software Consortium (ISC) dhcpctl API.
 
 %patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
 %patch103 -p1 -b .man
+%patch104 -p1
+%patch105 -p1
 
 # Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search
 # to the list of default requested DHCP options
