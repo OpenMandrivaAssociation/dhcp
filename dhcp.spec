@@ -4,12 +4,13 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	2
+Release:	3
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{patch_version}/%{name}-%{major_version}%{patch_version}.tar.gz
+Source1:	dhcp.sysusers
 Source2:	dhcpd.conf
 Source3:	dhcpd6.conf
 Source4:	dhcp-dynamic-dns-examples.tar.bz2
@@ -41,9 +42,6 @@ BuildRequires:	pkgconfig(krb5)
 BuildRequires:	pkgconfig(libsasl2)
 BuildRequires:	pkgconfig(com_err)
 BuildRequires:	pkgconfig(systemd)
-BuildRequires:	rpm-helper
-Requires(post):	rpm-helper
-Requires(preun):	rpm-helper
 
 %description
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows 
@@ -95,7 +93,8 @@ DHCP server and a DHCP relay agent.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
-Requires(post,preun):	rpm-helper
+%systemd_requires
+Requires(pre):	systemd
 
 %description	server
 DHCP server is the Internet Software Consortium (ISC) DHCP server for various
@@ -111,7 +110,7 @@ Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
 Provides:	dhcp-client-daemon
 Requires:	hostname
-Requires(post,postun):	rpm-helper
+%systemd_requires
 
 %description	client
 DHCP client is the Internet Software Consortium (ISC) DHCP client for various
@@ -126,7 +125,7 @@ install the base dhcp package.
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) relay
 Group:		System/Servers
 Requires:	dhcp-common >= %{EVRD}
-Requires(post,preun):	rpm-helper
+%systemd_requires
 
 %description	relay
 DHCP relay is the Internet Software Consortium (ISC) relay agent for DHCP
@@ -203,6 +202,7 @@ install -m 644 %{SOURCE16} %{buildroot}%{_unitdir}/dhcrelay.service
 install -D -p -m 644 %{SOURCE17} %{buildroot}%{_tmpfilesdir}/dhcpd.conf
 install -D -p -m 644 %{SOURCE18} %{buildroot}%{_tmpfilesdir}/dhclient.conf
 install -D -p -m 644 %{SOURCE19} %{buildroot}%{_tmpfilesdir}/dhcrelay.conf
+install -D -p -m 644 %{SOURCE1} %{buildroot}%{_sysusersdir}/dhcp.conf
 
 install -m 755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}
@@ -291,7 +291,7 @@ enable dhcrelay.service
 EOF
 
 %pre server
-%_pre_useradd dhcpd /dev/null /bin/false
+%sysusers_create_package %{name} %{SOURCE1}
 
 %post server
 # New dhcpd lease file
@@ -312,13 +312,14 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %files common
 %doc README contrib/ldap/README.ldap RELNOTES
 %doc contrib/3.0b1-lease-convert
-%{_mandir}/man5/dhcp-options.5*
+%doc %{_mandir}/man5/dhcp-options.5*
 
 %files doc
 %doc doc/*
 
 %files server
 %doc server/dhcpd*.conf.example tests/failover contrib/ldap/dhcp.schema
+%{_sysusersdir}/dhcp.conf
 %{_presetdir}/86-dhcp-server.preset
 %{_unitdir}/dhcpd.service
 %{_unitdir}/dhcpd6.service
@@ -333,12 +334,12 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %{_sbindir}/dhcpd-conf-to-ldap
 %{_sbindir}/dhcpd-chroot.sh
 %{_bindir}/omshell
-%{_mandir}/man1/omshell.1*
-%{_mandir}/man3/omapi.3*
-%{_mandir}/man5/dhcpd.conf.5*
-%{_mandir}/man5/dhcpd.leases.5*
-%{_mandir}/man5/dhcp-eval.5*
-%{_mandir}/man8/dhcpd.8*
+%doc %{_mandir}/man1/omshell.1*
+%doc %{_mandir}/man3/omapi.3*
+%doc %{_mandir}/man5/dhcpd.conf.5*
+%doc %{_mandir}/man5/dhcpd.leases.5*
+%doc %{_mandir}/man5/dhcp-eval.5*
+%doc %{_mandir}/man8/dhcpd.8*
 %dir %{_var}/lib/dhcpd
 %config(noreplace) %ghost %{_var}/lib/dhcpd/dhcpd.leases
 %config(noreplace) %ghost %{_var}/lib/dhcpd/dhcpd6.leases
@@ -349,20 +350,20 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %{_tmpfilesdir}/dhcrelay.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
 %{_sbindir}/dhcrelay
-%{_mandir}/man8/dhcrelay.8*
+%doc %{_mandir}/man8/dhcrelay.8*
 
 %files client
 %doc client/dhclient*.conf.example
 %attr (0755,root,root) /sbin/dhclient-script
 %{_tmpfilesdir}/dhclient.conf
 /sbin/dhclient
-%{_mandir}/man5/dhclient.conf.5*
-%{_mandir}/man5/dhclient.leases.5*
-%{_mandir}/man8/dhclient.8*
-%{_mandir}/man8/dhclient-script.8*
+%doc %{_mandir}/man5/dhclient.conf.5*
+%doc %{_mandir}/man5/dhclient.leases.5*
+%doc %{_mandir}/man8/dhclient.8*
+%doc %{_mandir}/man8/dhclient-script.8*
 %dir %{_var}/lib/dhclient
 %config(noreplace) %ghost %{_var}/lib/dhclient/dhclient.leases
 
 %files devel
 %{_includedir}/*
-%{_mandir}/man3/dhcpctl.3.*
+%doc %{_mandir}/man3/dhcpctl.3.*
