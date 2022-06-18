@@ -1,0 +1,22 @@
+diff -up dhcp-4.4.3/client/dhclient.c.omv~ dhcp-4.4.3/client/dhclient.c
+--- dhcp-4.4.3/client/dhclient.c.omv~	2022-06-18 20:11:36.051259050 +0200
++++ dhcp-4.4.3/client/dhclient.c	2022-06-18 20:12:12.637485167 +0200
+@@ -30,6 +30,7 @@
+  * fault and not Elliot's.
+  */
+ 
++#define _GNU_SOURCE 1 // for asprintf
+ #include "dhcpd.h"
+ #include <isc/util.h>
+ #include <isc/file.h>
+@@ -49,7 +50,9 @@
+  * Defined in stdio.h when _GNU_SOURCE is set, but we don't want to define
+  * that when building ISC code.
+  */
+-extern int asprintf(char **strp, const char *fmt, ...);
++// We have to do that anyway because the prototype used here is wrong
++// (missing restrict, ignoring _FORTIFY_SOURCE redefinitions, ...)
++//extern int asprintf(char **strp, const char *fmt, ...);
+ 
+ TIME default_lease_time = 43200; /* 12 hours... */
+ TIME max_lease_time = 86400; /* 24 hours... */

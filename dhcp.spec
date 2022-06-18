@@ -1,10 +1,12 @@
-%define major_version 4.4.2
+%global _disable_rebuild_configure 1
+
+%define major_version 4.4.3
 %define patch_version %{nil}
 
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	3
+Release:	1
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
@@ -25,16 +27,38 @@ Source16:	dhcrelay.service
 Source17:	dhcpd.tmpfiles
 Source18:	dhclient.tmpfiles
 Source19:	dhcrelay.tmpfiles
-# mageia patches
-Patch101:	dhcp-4.3.4-fix-format-errors.patch
-Patch103:	dhcp-4.2.5-P1-man.patch
-Patch104:	dhcp-4.4.2-gcc10.patch
-Patch105:	dhcp-4.4.1-var-run-to-run.patch
 # fedora patches
-Patch7:		dhcp-default-requested-options.patch
-Patch17:	dhcp-add_timeout_when_NULL.patch
-Patch18:	dhcp-64_bit_lease_parse.patch
-Patch19:	dhcp-sd_notify.patch
+Patch0:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0001-change-bug-url.patch
+Patch1:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0002-additional-dhclient-options.patch
+Patch2:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0003-Handle-releasing-interfaces-requested-by-sbin-ifup.patch
+Patch3:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0004-Support-unicast-BOOTP-for-IBM-pSeries-systems-and-ma.patch
+Patch4:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0005-Change-default-requested-options.patch
+Patch5:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0006-Various-man-page-only-fixes.patch
+Patch6:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0007-Change-paths-to-conform-to-our-standards.patch
+Patch7:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0008-Make-sure-all-open-file-descriptors-are-closed-on-ex.patch
+Patch8:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0009-Fix-garbage-in-format-string-error.patch
+Patch9:		https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0010-Handle-null-timeout.patch
+Patch10:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0011-Drop-unnecessary-capabilities.patch
+Patch11:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0012-RFC-3442-Classless-Static-Route-Option-for-DHCPv4-51.patch
+Patch12:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0013-DHCPv6-over-PPP-support-626514.patch
+Patch13:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0014-IPoIB-support-660681.patch
+Patch14:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0015-Add-GUID-DUID-to-dhcpd-logs-1064416.patch
+Patch15:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0016-Turn-on-creating-sending-of-DUID.patch
+Patch16:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0017-Send-unicast-request-release-via-correct-interface.patch
+Patch17:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0018-No-subnet-declaration-for-iface-should-be-info-not-e.patch
+Patch18:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0019-dhclient-write-DUID_LLT-even-in-stateless-mode-11563.patch
+Patch19:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0020-Discover-all-hwaddress-for-xid-uniqueness.patch
+Patch20:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0021-Load-leases-DB-in-non-replay-mode-only.patch
+Patch21:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0022-dhclient-make-sure-link-local-address-is-ready-in-st.patch
+Patch22:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0023-option-97-pxe-client-id.patch
+Patch23:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0024-Detect-system-time-changes.patch
+Patch24:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0025-bind-Detect-system-time-changes.patch
+Patch25:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0026-Add-dhclient-5-B-option-description.patch
+Patch26:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
+Patch27:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0028-Use-system-getaddrinfo-for-dhcp.patch
+Patch28:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/CVE-2021-25220.patch
+# OpenMandriva patches
+Patch100:	dhcp-4.4.3-compile.patch
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 #BuildRequires:	bind-devel
@@ -146,41 +170,54 @@ DHCP devel contains all of the libraries and headers for developing with the
 Internet Software Consortium (ISC) dhcpctl API.
 
 %prep
+# Not using %%autosetup because we need to untar
+# the bind tarball before applying patches
 %setup -qn %{name}-%{major_version}%{patch_version}
+cd bind
+tar xf bind.tar.gz
+ln -s bind-9* bind
+cd ..
+%autopatch -p1
 
-%patch101 -p1 -b .format_not_a_string_literal_and_no_format_arguments
-%patch103 -p1 -b .man
-%patch104 -p1
-%patch105 -p1
-
-# Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search
-# to the list of default requested DHCP options
-%patch7 -p1 -b .requested
-# Handle cases in add_timeout() where the function is called with a NULL
-# value for the 'when' parameter
-%patch17 -p1 -b .dracut
-# Ensure 64-bit platforms parse lease file dates & times correctly
-%patch18 -p1 -b .64-bit_lease_parse
-# Use notify systemd service
-%patch19 -p1
+# Update paths in all man pages
+for page in client/dhclient.conf.5 client/dhclient.leases.5 \
+            client/dhclient-script.8 client/dhclient.8 ; do
+	sed -i -e 's|CLIENTBINDIR|%{_sbindir}|g' \
+	       -e 's|RUNDIR|%{_localstatedir}/run|g' \
+	       -e 's|DBDIR|%{_localstatedir}/lib/dhclient|g' \
+	       -e 's|ETCDIR|%{dhcpconfdir}|g' $page
+done
+ 
+for page in server/dhcpd.conf.5 server/dhcpd.leases.5 server/dhcpd.8 ; do
+	sed -i -e 's|CLIENTBINDIR|%{_sbindir}|g' \
+	       -e 's|RUNDIR|%{_localstatedir}/run|g' \
+	       -e 's|DBDIR|%{_localstatedir}/lib/dhcpd|g' \
+	       -e 's|ETCDIR|%{dhcpconfdir}|g' $page
+done
+ 
+sed -i -e 's|/var/db/|%{_localstatedir}/lib/dhcpd/|g' contrib/dhcp-lease-list.pl
 
 install -m0644 %{SOURCE10} doc
 
 %build
 %serverbuild
 autoreconf -fiv
-%configure --enable-paranoia --enable-early-chroot --enable-binary-leases \
-    --with-ldap --with-ldapcrypto --with-ldap-gssapi \
-    --with-srv-lease-file=%{_var}/lib/dhcpd/dhcpd.leases \
-    --with-srv6-lease-file=%{_var}/lib/dhcpd/dhcpd6.leases \
-    --with-cli-lease-file=%{_var}/lib/dhclient/dhclient.leases \
-    --with-cli6-lease-file=%{_var}/lib/dhclient/dhclient6.leases \
-    --with-srv-pid-file=/run/dhcpd/dhcpd.pid \
-    --with-srv6-pid-file=/run/dhcpd/dhcpd6.pid \
-    --with-cli-pid-file=/run/dhclient/dhclient.pid \
-    --with-cli6-pid-file=/run/dhclient/dhclient6.pid \
-    --with-relay-pid-file=/run/dhcrelay/dhcrelay.pid \
-    --disable-static --with-systemd
+%configure \
+	--sbindir=%{_bindir} \
+	--enable-paranoia --enable-early-chroot --enable-binary-leases \
+	--with-ldap --with-ldapcrypto --with-ldap-gssapi \
+	--with-srv-lease-file=%{_var}/lib/dhcpd/dhcpd.leases \
+	--with-srv6-lease-file=%{_var}/lib/dhcpd/dhcpd6.leases \
+	--with-cli-lease-file=%{_var}/lib/dhclient/dhclient.leases \
+	--with-cli6-lease-file=%{_var}/lib/dhclient/dhclient6.leases \
+	--with-srv-pid-file=/run/dhcpd/dhcpd.pid \
+	--with-srv6-pid-file=/run/dhcpd/dhcpd6.pid \
+	--with-cli-pid-file=/run/dhclient/dhclient.pid \
+	--with-cli6-pid-file=/run/dhclient/dhclient6.pid \
+	--with-relay-pid-file=/run/dhcrelay/dhcrelay.pid \
+	--disable-static --with-systemd --enable-log-pid \
+	--enable-paranoia --enable-early-chroot \
+	--enable-binary-leases
 
 # (tpg) disable parallel build
 %config_update
@@ -190,9 +227,7 @@ autoreconf -fiv
 %make_install
 
 # Install correct dhclient-script
-install -d %{buildroot}/sbin
-mv %{buildroot}%{_sbindir}/dhclient %{buildroot}/sbin/dhclient
-install -m 755 client/scripts/linux %{buildroot}/sbin/dhclient-script
+install -m 755 client/scripts/linux %{buildroot}%{_bindir}/dhclient-script
 
 install -d %{buildroot}%{_unitdir}
 install -m 644 %{SOURCE12} %{buildroot}%{_unitdir}/dhcpd.service
@@ -204,10 +239,10 @@ install -D -p -m 644 %{SOURCE18} %{buildroot}%{_tmpfilesdir}/dhclient.conf
 install -D -p -m 644 %{SOURCE19} %{buildroot}%{_tmpfilesdir}/dhcrelay.conf
 install -D -p -m 644 %{SOURCE1} %{buildroot}%{_sysusersdir}/dhcp.conf
 
-install -m 755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_sbindir}
+install -m 755 %{SOURCE7} %{SOURCE8} %{buildroot}%{_bindir}
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}
 install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}
-install -m 755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_sbindir}
+install -m 755 contrib/ldap/dhcpd-conf-to-ldap %{buildroot}%{_bindir}
 
 # install exit-hooks script to /etc/
 install -m 755 %{SOURCE9} %{buildroot}%{_sysconfdir}
@@ -329,10 +364,10 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %config(noreplace) %{_sysconfdir}/dhclient-exit-hooks
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd6
-%{_sbindir}/dhcpd
-%{_sbindir}/dhcpreport.pl
-%{_sbindir}/dhcpd-conf-to-ldap
-%{_sbindir}/dhcpd-chroot.sh
+%{_bindir}/dhcpd
+%{_bindir}/dhcpreport.pl
+%{_bindir}/dhcpd-conf-to-ldap
+%{_bindir}/dhcpd-chroot.sh
 %{_bindir}/omshell
 %doc %{_mandir}/man1/omshell.1*
 %doc %{_mandir}/man3/omapi.3*
@@ -349,14 +384,14 @@ rm -rf %{_var}/lib/dhclient/dhclient.leases
 %{_unitdir}/dhcrelay.service
 %{_tmpfilesdir}/dhcrelay.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcrelay
-%{_sbindir}/dhcrelay
+%{_bindir}/dhcrelay
 %doc %{_mandir}/man8/dhcrelay.8*
 
 %files client
 %doc client/dhclient*.conf.example
-%attr (0755,root,root) /sbin/dhclient-script
+%attr (0755,root,root) %{_bindir}/dhclient-script
 %{_tmpfilesdir}/dhclient.conf
-/sbin/dhclient
+%{_bindir}/dhclient
 %doc %{_mandir}/man5/dhclient.conf.5*
 %doc %{_mandir}/man5/dhclient.leases.5*
 %doc %{_mandir}/man8/dhclient.8*
