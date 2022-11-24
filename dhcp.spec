@@ -1,7 +1,7 @@
 %global _disable_rebuild_configure 1
 
 %define major_version 4.4.3
-%define patch_version %{nil}
+%define patch_version P1
 
 Name:		dhcp
 Epoch:		3
@@ -11,7 +11,7 @@ Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/c
 License:	Distributable
 Group:		System/Servers
 URL:		http://www.isc.org/software/dhcp
-Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{patch_version}/%{name}-%{major_version}%{patch_version}.tar.gz
+Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{?patch_version:-%{patch_version}}/%{name}-%{major_version}%{?patch_version:-%{patch_version}}.tar.gz
 Source1:	dhcp.sysusers
 Source2:	dhcpd.conf
 Source3:	dhcpd6.conf
@@ -172,7 +172,7 @@ Internet Software Consortium (ISC) dhcpctl API.
 %prep
 # Not using %%autosetup because we need to untar
 # the bind tarball before applying patches
-%setup -qn %{name}-%{major_version}%{patch_version}
+%setup -qn %{name}-%{major_version}%{?patch_version:-%{patch_version}}
 cd bind
 tar xf bind.tar.gz
 ln -s bind-9* bind
