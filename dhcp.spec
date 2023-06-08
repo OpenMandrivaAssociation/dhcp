@@ -6,7 +6,7 @@
 Name:		dhcp
 Epoch:		3
 Version:	%{major_version}%{patch_version}
-Release:	2
+Release:	1
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
