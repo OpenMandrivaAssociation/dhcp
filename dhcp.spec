@@ -217,7 +217,10 @@ autoreconf -fiv
 	--with-relay-pid-file=/run/dhcrelay/dhcrelay.pid \
 	--disable-static --with-systemd --enable-log-pid \
 	--enable-paranoia --enable-early-chroot \
-	--enable-binary-leases
+	--enable-binary-leases \
+%if %{cross_compiling}
+	--with-randomdev=/dev/urandom
+%endif
 
 # (tpg) disable parallel build
 %config_update
