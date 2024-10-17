@@ -10,7 +10,7 @@ Release:	1
 Summary:	The ISC DHCP (Dynamic Host Configuration Protocol) server/relay agent/client
 License:	Distributable
 Group:		System/Servers
-URL:		http://www.isc.org/software/dhcp
+URL:		https://www.isc.org/software/dhcp
 Source0:	ftp://ftp.isc.org/isc/%{name}/%{major_version}%{?patch_version:-%{patch_version}}/%{name}-%{major_version}%{?patch_version:-%{patch_version}}.tar.gz
 Source1:	dhcp.sysusers
 Source2:	dhcpd.conf
