@@ -59,6 +59,11 @@ Patch27:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/0028-Use-system-g
 Patch28:	https://src.fedoraproject.org/rpms/dhcp/raw/rawhide/f/CVE-2021-25220.patch
 # OpenMandriva patches
 Patch100:	dhcp-4.4.3-compile.patch
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	groff-for-man
 BuildRequires:	openldap-devel
 #BuildRequires:	bind-devel
